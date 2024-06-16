@@ -1,13 +1,14 @@
 /* eslint-disable react/no-unstable-nested-components */
 import React from 'react';
-import {theme as themes} from '@/libs/config/theme';
+import {Theme, theme as themes} from '@/libs/config/theme';
 import {useThemedStyles} from '@/libs/hooks';
 import {AccountScreen, DevicesScreen, HomeScreen} from '@/screens';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {StyleSheet, TextStyle} from 'react-native';
+import {StyleSheet, TextStyle, View} from 'react-native';
 import {HomeIcon} from '@/components/common/icons/Home';
 import {AccountIcon, AddIcon, Typography} from '@/components/common';
 import {heightPixel, pixelSizeVertical} from '@/libs/utils';
+import {Header} from '@/components/common/header';
 
 const Tab = createBottomTabNavigator();
 
@@ -16,7 +17,7 @@ type TabBarLabelProps = {
 };
 
 export const Dashboard = () => {
-  const {tabBarStyle} = useThemedStyles(styles);
+  const {tabBarStyle, container} = useThemedStyles(styles);
   const tabLabelStyle = (focused: boolean): TextStyle => ({
     fontWeight: '500',
     fontSize: themes.fontSize.s,
@@ -34,28 +35,31 @@ export const Dashboard = () => {
   });
 
   return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle,
-      }}>
-      {tabs.map(item => (
-        <Tab.Screen
-          key={item.name}
-          name={item.name}
-          options={{
-            title: item.name,
-            tabBarLabel: ({focused}: TabBarLabelProps) => (
-              <Typography variant="b2" style={tabLabelStyle(focused)}>
-                {item.name}
-              </Typography>
-            ),
-            tabBarIcon: item.icon,
-          }}
-          component={item.component}
-        />
-      ))}
-    </Tab.Navigator>
+    <View style={container}>
+      <Header />
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle,
+        }}>
+        {tabs.map(item => (
+          <Tab.Screen
+            key={item.name}
+            name={item.name}
+            options={{
+              title: item.name,
+              tabBarLabel: ({focused}: TabBarLabelProps) => (
+                <Typography variant="b2" style={tabLabelStyle(focused)}>
+                  {item.name}
+                </Typography>
+              ),
+              tabBarIcon: item.icon,
+            }}
+            component={item.component}
+          />
+        ))}
+      </Tab.Navigator>
+    </View>
   );
 };
 
@@ -87,8 +91,13 @@ const tabs = [
   },
 ];
 
-const styles = () => {
+const styles = (theme: Theme) => {
   return StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingTop: pixelSizeVertical(20),
+      backgroundColor: theme.colors.white[100],
+    },
     tabBarStyle: {
       elevation: 0,
       borderTopWidth: 0,
