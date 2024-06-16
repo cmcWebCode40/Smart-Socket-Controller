@@ -95,15 +95,16 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
 const styles = (theme: Theme) => {
   return StyleSheet.create({
     button: {
-      paddingVertical: pixelSizeVertical(16),
-      borderRadius: theme.radius.md,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
+      paddingVertical: pixelSizeVertical(16),
+      borderRadius: theme.radius.xxxl,
     },
     buttonText: {
-      fontSize: fontPixel(theme.fontSize.m),
       fontWeight: '600',
+      textTransform: 'capitalize',
+      fontSize: fontPixel(theme.fontSize.l),
     },
     contained: {
       backgroundColor: theme.colors.orange[200],
@@ -120,7 +121,7 @@ const styles = (theme: Theme) => {
       color: theme.colors.black[100],
     },
     containedText: {
-      color: theme.colors.white[100],
+      color: theme.colors.orange[400],
     },
     outLineText: {
       color: theme.colors.gray[200],

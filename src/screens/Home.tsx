@@ -1,13 +1,66 @@
-import {View, Text, StyleSheet} from 'react-native';
+import {View, StyleSheet, ScrollView} from 'react-native';
 import React from 'react';
 import {useThemedStyles} from '@/libs/hooks';
 import {Theme} from '@/libs/config/theme';
+import {
+  heightPixel,
+  pixelSizeHorizontal,
+  pixelSizeVertical,
+} from '@/libs/utils';
+import {Button, Typography} from '@/components/common';
+import {EnergyUsageProgressIndicator} from '@/components/energy-usage-progress-indicator';
+import {colors} from '@/libs/constants';
+import {EnergyUsageChart} from '@/components/chart';
+import {EnergyDeviceCard} from '@/components/energy-device-cards';
 
 export const HomeScreen: React.FunctionComponent = () => {
   const style = useThemedStyles(styles);
   return (
     <View style={style.container}>
-      <Text>HomeScreen</Text>
+      <ScrollView
+        style={style.scrollContainer}
+        showsVerticalScrollIndicator={false}>
+        <View style={style.energyUsageContainer}>
+          <Button
+            variant="outlined"
+            style={style.energyUsageBtn}
+            textStyles={style.energyUsageBtnText}>
+            Total Energy Usage KWh
+          </Button>
+        </View>
+        <View style={style.progressIndicatorContainer}>
+          <EnergyUsageProgressIndicator />
+        </View>
+        <View style={style.devices}>
+          {['Socket 1', 'Socket 2'].map((item, index) => (
+            <View style={style.deviceItem} key={item}>
+              <View
+                style={[
+                  style.indicator,
+                  {
+                    backgroundColor:
+                      index % 2 === 0 ? colors.orange[400] : colors.yellow[100],
+                  },
+                ]}
+              />
+              <Typography style={style.device}>{item}</Typography>
+            </View>
+          ))}
+        </View>
+        <View style={style.energyChartContainer}>
+          <EnergyUsageChart />
+        </View>
+        <View style={style.deviceCards}>
+          <Typography style={style.deviceHeaderTitle}>
+            High Usage Device
+          </Typography>
+          <View style={style.connectDeviceList}>
+            {['Socket 1', 'Socket 2'].map(item => (
+              <EnergyDeviceCard style={style.connectedDeviceCard} key={item} />
+            ))}
+          </View>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -16,7 +69,65 @@ const styles = (theme: Theme) => {
   return StyleSheet.create({
     container: {
       flex: 1,
+      paddingVertical: pixelSizeVertical(16),
+      paddingHorizontal: pixelSizeHorizontal(16),
       backgroundColor: theme.colors.white[100],
+    },
+    energyUsageBtn: {
+      borderColor: theme.colors.yellow[100],
+    },
+    energyUsageBtnText: {
+      color: theme.colors.black[200],
+    },
+    energyUsageContainer: {
+      width: '60%',
+      marginHorizontal: 'auto',
+      marginTop: pixelSizeVertical(24),
+    },
+    progressIndicatorContainer: {
+      marginHorizontal: 'auto',
+      marginTop: pixelSizeVertical(40),
+    },
+    devices: {
+      flexDirection: 'row',
+      marginHorizontal: 'auto',
+      marginTop: pixelSizeVertical(32),
+    },
+    deviceItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: pixelSizeHorizontal(24),
+    },
+    indicator: {
+      height: heightPixel(20),
+      width: heightPixel(20),
+      borderRadius: theme.radius.full,
+      marginRight: pixelSizeHorizontal(8),
+    },
+    energyChartContainer: {
+      marginTop: pixelSizeVertical(32),
+    },
+    device: {
+      fontSize: theme.fontSize.m,
+    },
+    deviceCards: {
+      marginTop: pixelSizeVertical(24),
+      marginBottom: pixelSizeVertical(24),
+    },
+    deviceHeaderTitle: {
+      fontSize: theme.fontSize.m,
+    },
+    connectDeviceList: {
+      flexDirection: 'row',
+      marginTop: pixelSizeVertical(16),
+    },
+    connectedDeviceCard: {
+      flexBasis: '49%',
+      marginRight: pixelSizeHorizontal(8),
+    },
+    scrollContainer: {
+      paddingBottom: pixelSizeVertical(24),
     },
   });
 };

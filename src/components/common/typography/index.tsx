@@ -27,12 +27,12 @@ const styles = ({colors, fontSize, fonts}: Theme) => {
       fontSize: fontPixel(fontSize.xxl),
       fontWeight: '700',
       fontFamily: fonts.ManropeBold,
-      color: colors.black[100],
+      color: colors.black[200],
     },
     h2: {
       fontSize: fontPixel(fontSize.xl),
       fontWeight: '500',
-      color: colors.black[100],
+      color: colors.black[200],
       fontFamily: fonts.ManropeSemibold,
     },
     b1: {

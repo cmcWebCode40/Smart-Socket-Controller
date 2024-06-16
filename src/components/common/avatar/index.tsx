@@ -1,11 +1,34 @@
-import {View} from 'react-native';
+import {Image, ImageProps, ImageSourcePropType, StyleSheet} from 'react-native';
 import React from 'react';
-import {Typography} from '../typography';
+import {useThemedStyles} from '@/libs/hooks';
+import MockedAvatar from '../../../../assets/images/mock_avatar.png';
+import {Theme} from '@/libs/config/theme';
 
-export const Avatar: React.FunctionComponent = () => {
+interface AvatarProps extends ImageProps {
+  source?: ImageSourcePropType;
+}
+
+export const Avatar: React.FunctionComponent<AvatarProps> = ({
+  style: customStyles,
+  source = MockedAvatar,
+  ...otherImageProps
+}) => {
+  const style = useThemedStyles(styles);
   return (
-    <View>
-      <Typography>Avatar</Typography>
-    </View>
+    <Image
+      source={source}
+      {...otherImageProps}
+      style={[style.image, customStyles]}
+    />
   );
+};
+
+const styles = (theme: Theme) => {
+  return StyleSheet.create({
+    image: {
+      height: 45,
+      width: 45,
+      borderRadius: theme.radius.full,
+    },
+  });
 };
