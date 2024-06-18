@@ -7,11 +7,11 @@ import {
   pixelSizeHorizontal,
   pixelSizeVertical,
 } from '@/libs/utils';
-import {Button, Typography} from '@/components/common';
-import {EnergyUsageProgressIndicator} from '@/components/energy-usage-progress-indicator';
 import {colors} from '@/libs/constants';
 import {EnergyUsageChart} from '@/components/chart';
-import {EnergyDeviceCard} from '@/components/energy-device-cards';
+import {Button, Typography} from '@/components/common';
+import {MinimalEnergyDeviceCard} from '@/components/energy-device-cards';
+import {EnergyUsageProgressIndicator} from '@/components/energy-usage-progress-indicator';
 
 export const HomeScreen: React.FunctionComponent = () => {
   const style = useThemedStyles(styles);
@@ -55,8 +55,12 @@ export const HomeScreen: React.FunctionComponent = () => {
             High Usage Device
           </Typography>
           <View style={style.connectDeviceList}>
-            {['Socket 1', 'Socket 2'].map(item => (
-              <EnergyDeviceCard style={style.connectedDeviceCard} key={item} />
+            {['Socket 1', 'Socket 2'].map((item, index) => (
+              <MinimalEnergyDeviceCard
+                key={item}
+                index={index}
+                style={style.connectedDeviceCard}
+              />
             ))}
           </View>
         </View>
@@ -117,13 +121,16 @@ const styles = (theme: Theme) => {
     },
     deviceHeaderTitle: {
       fontSize: theme.fontSize.m,
+      fontWeight: '600',
+      fontFamily: theme.fonts.ManropeBold,
     },
     connectDeviceList: {
       flexDirection: 'row',
+      justifyContent: 'space-between',
       marginTop: pixelSizeVertical(16),
     },
     connectedDeviceCard: {
-      flexBasis: '49%',
+      flexBasis: '46%',
       marginRight: pixelSizeHorizontal(8),
     },
     scrollContainer: {

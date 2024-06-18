@@ -17,7 +17,7 @@ type TabBarLabelProps = {
 };
 
 export const Dashboard = () => {
-  const {tabBarStyle, container} = useThemedStyles(styles);
+  const {tabBarStyle, container, header} = useThemedStyles(styles);
   const tabLabelStyle = (focused: boolean): TextStyle => ({
     fontWeight: '500',
     fontSize: themes.fontSize.s,
@@ -36,7 +36,9 @@ export const Dashboard = () => {
 
   return (
     <View style={container}>
-      <Header />
+      <View style={header}>
+        <Header />
+      </View>
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
@@ -102,6 +104,9 @@ const styles = (theme: Theme) => {
       elevation: 0,
       borderTopWidth: 0,
       minHeight: heightPixel(65),
+    },
+    header: {
+      paddingHorizontal: pixelSizeVertical(16),
     },
   });
 };
