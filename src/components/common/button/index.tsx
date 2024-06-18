@@ -21,7 +21,7 @@ interface ButtonProps extends PressableProps {
   noStyles?: boolean;
   size?: ButtonSize;
   variant?: ButtonVariant;
-  textStyles?: TextStyle;
+  textStyles?: StyleProp<TextStyle>;
   children: React.ReactNode;
   prefixIcon?: React.ReactNode;
   style?: StyleProp<ViewStyle>;

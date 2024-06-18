@@ -1,18 +1,55 @@
-import {StyleSheet, View} from 'react-native';
+import {
+  StyleProp,
+  StyleSheet,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import React from 'react';
 import {Avatar} from '../avatar';
 import {Button} from '../button';
-import {BluetoothRoundedIcon} from '../icons';
+import {BluetoothRoundedIcon, HomeRoundedIcon} from '../icons';
 import {useThemedStyles} from '@/libs/hooks';
 import {Theme} from '@/libs/config/theme';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackScreens} from '@/navigation/type';
 
-export const Header: React.FunctionComponent = () => {
+interface HeaderProps {
+  title?: string;
+  showHomeIcon?: boolean;
+  buttonStyles?: StyleProp<ViewStyle>;
+  buttonTextStyles?: StyleProp<TextStyle>;
+}
+
+export const Header: React.FunctionComponent<HeaderProps> = ({
+  buttonStyles,
+  title,
+  showHomeIcon,
+  buttonTextStyles,
+}) => {
   const style = useThemedStyles(styles);
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackScreens>>();
+  const navigateToDashboard = () => {
+    navigation.navigate('Dashboard');
+  };
   return (
     <View style={style.container}>
-      <Avatar />
-      <Button style={style.btn}>Israel Obanijesu</Button>
-      <BluetoothRoundedIcon />
+      {showHomeIcon ? (
+        <TouchableOpacity onPress={navigateToDashboard}>
+          <HomeRoundedIcon />
+        </TouchableOpacity>
+      ) : (
+        <Avatar />
+      )}
+      <Button style={[style.btn, buttonStyles]} textStyles={buttonTextStyles}>
+        {title ?? 'Israel Obanijesu'}
+      </Button>
+      <TouchableOpacity onPress={() => navigation.navigate('AddDevice')}>
+        <BluetoothRoundedIcon />
+      </TouchableOpacity>
     </View>
   );
 };
