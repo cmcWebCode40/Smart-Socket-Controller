@@ -1,10 +1,10 @@
 import React from 'react';
-import {Typography} from '../common';
+import {Typography, WireLessIcon} from '../common';
 import {StyleSheet, View} from 'react-native';
 import {AnimatedCircularProgress} from 'react-native-circular-progress';
 import {Theme, theme as themes} from '@/libs/config/theme';
 import {useThemedStyles} from '@/libs/hooks';
-import {heightPixel, pixelSizeHorizontal} from '@/libs/utils';
+import {fontPixel, heightPixel, pixelSizeHorizontal} from '@/libs/utils';
 import {Circle} from 'react-native-svg';
 
 interface EnergyUsageProgressIndicatorProps {
@@ -19,6 +19,7 @@ export const EnergyUsageProgressIndicator: React.FunctionComponent<
     colors: {orange, gray, green},
   } = themes;
   const fillColor = invertColor ? green[300] : orange[400];
+  const wirelessColor = invertColor ? orange[400] : green[300];
   return (
     <AnimatedCircularProgress
       width={20}
@@ -33,9 +34,13 @@ export const EnergyUsageProgressIndicator: React.FunctionComponent<
       )}>
       {() => (
         <View style={style.content}>
+          <WireLessIcon color={wirelessColor} />
           <Typography variant="h1">250KWh</Typography>
           <Typography variant="h2" style={style.subTitle}>
             80% of the Limit
+          </Typography>
+          <Typography variant="b1" style={style.tag}>
+            Energy Usage
           </Typography>
         </View>
       )}
@@ -57,12 +62,20 @@ const styles = (theme: Theme) => {
       backgroundColor: theme.colors.white[100],
     },
     content: {
-      padding: pixelSizeHorizontal(24),
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: pixelSizeHorizontal(20),
     },
     subTitle: {
       color: theme.colors.black[200],
       fontSize: theme.fontSize.m,
-      fontFamily: theme.fonts.ManropeSemibold,
+      fontFamily: theme.fonts.ManropeBold,
+    },
+    tag: {
+      textAlign: 'center',
+      fontSize: fontPixel(theme.fontSize.s),
+      color: theme.colors.black[200],
     },
   });
 };

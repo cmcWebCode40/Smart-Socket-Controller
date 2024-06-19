@@ -77,8 +77,6 @@ const styles = (theme: Theme) => {
       position: 'relative',
     },
     image: {
-      zIndex: 9999,
-      top: 1.5,
       marginHorizontal: 'auto',
     },
     container: {

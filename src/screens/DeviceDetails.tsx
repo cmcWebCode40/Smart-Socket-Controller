@@ -4,7 +4,7 @@ import {useThemedStyles} from '@/libs/hooks';
 import {Theme} from '@/libs/config/theme';
 import {fontPixel, pixelSizeHorizontal, pixelSizeVertical} from '@/libs/utils';
 import {Header} from '@/components/common/header';
-import {Typography} from '@/components/common';
+import {Button, Typography, WarningIcon} from '@/components/common';
 import {EnergyUsageProgressIndicator} from '@/components/energy-usage-progress-indicator';
 import {
   DeviceInfoStatus,
@@ -64,6 +64,21 @@ export const DeviceDetailsScreen: React.FunctionComponent = () => {
               <EnergyDeviceInfoCard type={item.type} value={item.value} />
             </View>
           ))}
+        </View>
+        <View style={style.buttonContainer}>
+          <Button
+            variant="outlined"
+            style={style.limit}
+            prefixIcon={<WarningIcon />}
+            textStyles={style.limitTextStyle}>
+            Set Load Limit
+          </Button>
+          <Button
+            variant="outlined"
+            style={style.reset}
+            textStyles={style.resetTextStyle}>
+            Reset
+          </Button>
         </View>
       </ScrollView>
     </View>
@@ -136,6 +151,28 @@ const styles = (theme: Theme) => {
     },
     infoCard: {
       width: '48%',
+      marginBottom: pixelSizeVertical(24),
+    },
+    reset: {
+      borderRadius: theme.radius.lg,
+      marginTop: pixelSizeVertical(20),
+      borderColor: theme.colors.green[500],
+    },
+    resetTextStyle: {
+      color: theme.colors.green[500],
+      fontSize: fontPixel(theme.fontSize.xl),
+    },
+    limit: {
+      borderRadius: theme.radius.lg,
+      marginTop: pixelSizeVertical(20),
+      borderColor: theme.colors.orange[400],
+    },
+    limitTextStyle: {
+      color: theme.colors.gray[500],
+      fontSize: fontPixel(theme.fontSize.xl),
+    },
+    buttonContainer: {
+      marginTop: pixelSizeVertical(40),
       marginBottom: pixelSizeVertical(24),
     },
   });

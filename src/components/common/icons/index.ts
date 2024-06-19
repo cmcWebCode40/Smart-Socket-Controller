@@ -10,3 +10,5 @@ export * from './ElectricPlug';
 export * from './Frequency';
 export * from './HomeRounded';
 export * from './BluetoothAudio';
+export * from './Warning';
+export * from './WireLess';

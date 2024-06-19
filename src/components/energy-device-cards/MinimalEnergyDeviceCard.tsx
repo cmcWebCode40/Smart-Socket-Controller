@@ -1,4 +1,11 @@
-import {View, StyleSheet, StyleProp, ViewStyle, Image} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  StyleProp,
+  ViewStyle,
+  Image,
+  Pressable,
+} from 'react-native';
 import React from 'react';
 import {useThemedStyles} from '@/libs/hooks';
 import {Theme} from '@/libs/config/theme';
@@ -10,15 +17,16 @@ import {colors} from '@/libs/constants';
 interface MinimalEnergyDeviceCardProps {
   style?: StyleProp<ViewStyle>;
   index: number;
+  onViewDetails: () => void;
 }
 
 export const MinimalEnergyDeviceCard: React.FunctionComponent<
   MinimalEnergyDeviceCardProps
-> = ({style, index}) => {
+> = ({style, index, onViewDetails}) => {
   const mainStyle = useThemedStyles(styles);
   const textColor = index % 2 === 0 ? colors.orange[400] : colors.green[300];
   return (
-    <View style={[mainStyle.wrapper, style]}>
+    <Pressable onPress={onViewDetails} style={[mainStyle.wrapper, style]}>
       <Image source={TriangleImage} style={mainStyle.image} />
       <View style={mainStyle.container}>
         <View style={[mainStyle.flexDir, mainStyle.cardHeader]}>
@@ -35,7 +43,7 @@ export const MinimalEnergyDeviceCard: React.FunctionComponent<
           <SwitchIcon />
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

@@ -32,7 +32,6 @@ export const AddDeviceScreen: React.FunctionComponent = () => {
       <View style={style.bleIcon}>
         <BluetoothAudioIcon />
       </View>
-
       <View style={[style.content, style.boxShadow]}>
         <View style={[style.innerContent, style.boxShadow]}>
           <Typography style={style.scanText}>1 Device Found</Typography>
@@ -115,6 +114,7 @@ const styles = (theme: Theme) => {
     bleIcon: {
       position: 'absolute',
       top: '40%',
+      zIndex: 999,
       marginLeft: pixelSizeHorizontal(4),
     },
   });

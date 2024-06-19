@@ -12,9 +12,19 @@ import {EnergyUsageChart} from '@/components/chart';
 import {Button, Typography} from '@/components/common';
 import {MinimalEnergyDeviceCard} from '@/components/energy-device-cards';
 import {EnergyUsageProgressIndicator} from '@/components/energy-usage-progress-indicator';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackScreens} from '@/navigation/type';
 
 export const HomeScreen: React.FunctionComponent = () => {
   const style = useThemedStyles(styles);
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackScreens>>();
+
+  const handleViewDetails = () => {
+    navigation.navigate('DeviceDetails');
+  };
+
   return (
     <View style={style.container}>
       <ScrollView
@@ -57,8 +67,8 @@ export const HomeScreen: React.FunctionComponent = () => {
           <View style={style.connectDeviceList}>
             {['Socket 1', 'Socket 2'].map((item, index) => (
               <MinimalEnergyDeviceCard
-                key={item}
                 index={index}
+                onViewDetails={handleViewDetails}
                 style={style.connectedDeviceCard}
               />
             ))}
@@ -130,8 +140,7 @@ const styles = (theme: Theme) => {
       marginTop: pixelSizeVertical(16),
     },
     connectedDeviceCard: {
-      flexBasis: '46%',
-      marginRight: pixelSizeHorizontal(8),
+      flexBasis: '47%',
     },
     scrollContainer: {
       paddingBottom: pixelSizeVertical(24),
