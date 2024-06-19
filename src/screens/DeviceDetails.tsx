@@ -4,7 +4,7 @@ import {useThemedStyles} from '@/libs/hooks';
 import {Theme} from '@/libs/config/theme';
 import {fontPixel, pixelSizeHorizontal, pixelSizeVertical} from '@/libs/utils';
 import {Header} from '@/components/common/header';
-import {Typography} from '@/components/common';
+import {Button, Typography} from '@/components/common';
 import {EnergyUsageProgressIndicator} from '@/components/energy-usage-progress-indicator';
 import {
   DeviceInfoStatus,
@@ -64,6 +64,10 @@ export const DeviceDetailsScreen: React.FunctionComponent = () => {
               <EnergyDeviceInfoCard type={item.type} value={item.value} />
             </View>
           ))}
+        </View>
+        <View>
+          <Button>Set Load Limit</Button>
+          <Button>Reset</Button>
         </View>
       </ScrollView>
     </View>
