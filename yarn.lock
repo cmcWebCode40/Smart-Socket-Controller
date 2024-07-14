@@ -3267,8 +3267,10 @@ __metadata:
     prettier: 2.8.8
     react: 18.2.0
     react-native: 0.74.2
+    react-native-ble-manager: ^11.5.5
     react-native-circular-progress: ^1.4.0
     react-native-dotenv: ^3.4.11
+    react-native-flash-message: ^0.4.2
     react-native-gesture-handler: ^2.16.2
     react-native-gifted-charts: ^1.4.10
     react-native-linear-gradient: ^2.8.3
@@ -3278,6 +3280,8 @@ __metadata:
     react-native-svg: ^15.3.0
     react-native-svg-transformer: ^1.4.0
     react-test-renderer: 18.2.0
+    text-decoding: ^1.0.0
+    text-encoding: ^0.7.0
     typescript: 5.0.4
   languageName: unknown
   linkType: soft
@@ -8564,6 +8568,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-ble-manager@npm:^11.5.5":
+  version: 11.5.5
+  resolution: "react-native-ble-manager@npm:11.5.5"
+  peerDependencies:
+    react-native: ">=0.60.0"
+  checksum: 1679c55e86c73dbb3316a8c2dd71ac7253b4aae5e88edd753495cf6ccaf99f2de8ed2021ca01ff9c766e5e4a40b4ab0dc4ec3f99022f5e7b1ff5228d37523d40
+  languageName: node
+  linkType: hard
+
 "react-native-circular-progress@npm:^1.4.0":
   version: 1.4.0
   resolution: "react-native-circular-progress@npm:1.4.0"
@@ -8585,6 +8598,20 @@ __metadata:
   peerDependencies:
     "@babel/runtime": ^7.20.6
   checksum: 3ebac2c2ed79dd7e4920fd3fc2da9187413b7190231618e4858b46c47833677838b96d531afe7bd5c4b0a60454dba40cb8708722210df5d522e30aefbf41da05
+  languageName: node
+  linkType: hard
+
+"react-native-flash-message@npm:^0.4.2":
+  version: 0.4.2
+  resolution: "react-native-flash-message@npm:0.4.2"
+  dependencies:
+    prop-types: ^15.8.1
+    react-native-iphone-screen-helper: ^2.0.2
+  peerDependencies:
+    prop-types: ^15.0 || ^16.0
+    react: "*"
+    react-native: "*"
+  checksum: ab1e83db9f75888607cdeac8160194630a3e16f5e16133b6316d595b392b92f1c3b8e597e365636dcf3c622a4a5731753ce24fe9710867335c06ec0d212c5178
   languageName: node
   linkType: hard
 
@@ -8621,6 +8648,15 @@ __metadata:
     react-native-linear-gradient:
       optional: true
   checksum: 0b474460a362c6e6359912f2dbb319d94b598e7b95ce9eaf26110da79eb13122b86cbaa753c7e0bb1381b43fce7e9e36fb0e4186ae19b53f3493efaa108cbebc
+  languageName: node
+  linkType: hard
+
+"react-native-iphone-screen-helper@npm:^2.0.2":
+  version: 2.1.1
+  resolution: "react-native-iphone-screen-helper@npm:2.1.1"
+  peerDependencies:
+    react-native: ">=0.42.0"
+  checksum: 1acbff415fcade41b0f191ea644bc1ef84c7b10b617ca8e82db586f2f3a371a867cca81f39f1971db7b582a42ffbbf804d6b132424635b03d28eeecf4698e84d
   languageName: node
   linkType: hard
 
@@ -9816,6 +9852,20 @@ __metadata:
     glob: ^7.1.4
     minimatch: ^3.0.4
   checksum: 3b34a3d77165a2cb82b34014b3aba93b1c4637a5011807557dc2f3da826c59975a5ccad765721c4648b39817e3472789f9b0fa98fc854c5c1c7a1e632aacdc28
+  languageName: node
+  linkType: hard
+
+"text-decoding@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "text-decoding@npm:1.0.0"
+  checksum: 4b2359d8efdabea72ac470304e991913e9b82a55b1c33ab5204f115d11305ac5900add80aee5f7d22b2bcf0faebaf35b193d28a10b74adf175d9ac9d63604445
+  languageName: node
+  linkType: hard
+
+"text-encoding@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "text-encoding@npm:0.7.0"
+  checksum: b6109a843fb1b8748b32e1ecd6df74d370f46c13ac136bcb6ca15db70209bb0b8ec1f296ebb4b0dd9961150e205dcc044b89f8cf7657f6faef78c7569a2a81bc
   languageName: node
   linkType: hard
 
