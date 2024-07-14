@@ -1,41 +1,71 @@
 import {View, StyleSheet, ViewStyle, ScrollView} from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {useThemedStyles} from '@/libs/hooks';
 import {Theme} from '@/libs/config/theme';
 import {fontPixel, pixelSizeHorizontal, pixelSizeVertical} from '@/libs/utils';
 import {Header} from '@/components/common/header';
-import {Button, Typography, WarningIcon} from '@/components/common';
+import {Button, Modal, Typography, WarningIcon} from '@/components/common';
 import {EnergyUsageProgressIndicator} from '@/components/energy-usage-progress-indicator';
 import {
   DeviceInfoStatus,
   EnergyDeviceInfoCard,
 } from '@/components/energy-device-cards';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {RootStackScreens} from '@/navigation/type';
+import {useBluetoothContext} from '@/libs/context';
+import {SocketInfo} from '@/libs/types';
+import {EnergyLimitForm} from '@/components/set-energy-limit-form';
 
-export const DeviceDetailsScreen: React.FunctionComponent = () => {
+type DeviceDetailsScreenProps = NativeStackScreenProps<
+  RootStackScreens,
+  'DeviceDetails'
+>;
+
+export const DeviceDetailsScreen: React.FunctionComponent<
+  DeviceDetailsScreenProps
+> = ({route: {params}}) => {
+  const [openModal, setOpenModal] = useState(false);
   const style = useThemedStyles(styles);
+  const {write, socketInfo, characteristics} = useBluetoothContext();
+
+  const socket = socketInfo && (socketInfo[params.socketId] as SocketInfo);
 
   const info: {type: DeviceInfoStatus; value: string}[] = [
     {
       type: 'AC_CURRENT',
-      value: '220.0 V',
+      value: `${socket?.current} A`,
     },
     {
       type: 'AC_VOLTAGE',
-      value: '0.0002 A',
+      value: `${socket?.voltage} V`,
     },
     {
       type: 'POWER_CONSUMPTION',
-      value: '0.100 KW ',
+      value: `${socket?.power} KW`,
     },
     {
       type: 'FREQUENCY',
-      value: '50',
+      value: `${socket?.frequency}`,
     },
   ];
+
+  if (!socket) {
+    return null;
+  }
+
+  const resetSocket = () => {
+    const payload = {id: socket.id, cmd: 'reset'};
+    const uint8Array = new TextEncoder().encode(JSON.stringify(payload));
+    const byteArray = Array.from(uint8Array);
+    if (characteristics) {
+      write(byteArray, characteristics);
+    }
+  };
+
   return (
     <View style={style.container}>
       <Header
-        title="SCK0001"
+        title={socket.id}
         showHomeIcon={true}
         buttonStyles={style.headerButton}
         buttonTextStyles={style.headerButtonText}
@@ -44,7 +74,7 @@ export const DeviceDetailsScreen: React.FunctionComponent = () => {
         <View style={style.deviceStatus}>
           <View style={[style.status, style.devicePowerStatus]}>
             <Typography style={[style.statusText, style.devicePowerStatusText]}>
-              ! 200KW Load Limit Set
+              {socket.power} KW Load Limit Set
             </Typography>
           </View>
           <View style={[style.status, style.deviceStateStatus]}>
@@ -54,7 +84,7 @@ export const DeviceDetailsScreen: React.FunctionComponent = () => {
           </View>
         </View>
         <View style={style.progressIndicatorContainer}>
-          <EnergyUsageProgressIndicator invertColor />
+          <EnergyUsageProgressIndicator power={socket.power} invertColor />
         </View>
         <View style={style.infoContainer}>
           {info.map((item, index) => (
@@ -70,17 +100,25 @@ export const DeviceDetailsScreen: React.FunctionComponent = () => {
             variant="outlined"
             style={style.limit}
             prefixIcon={<WarningIcon />}
+            onPress={() => setOpenModal(true)}
             textStyles={style.limitTextStyle}>
             Set Load Limit
           </Button>
           <Button
             variant="outlined"
             style={style.reset}
+            onPress={resetSocket}
             textStyles={style.resetTextStyle}>
             Reset
           </Button>
         </View>
       </ScrollView>
+      <Modal
+        onClose={() => setOpenModal(false)}
+        title="Set Energy Limit"
+        visible={openModal}>
+        <EnergyLimitForm />
+      </Modal>
     </View>
   );
 };

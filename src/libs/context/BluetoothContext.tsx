@@ -1,7 +1,7 @@
-//@ts-ignore
-// @ts-nocheck
-// import {byteToString} from '@/utils';
-import {useEffect, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
+import {showMessage} from 'react-native-flash-message';
+import {byteToString} from '../utils/binaryFormatters';
+import BleManager, {Peripheral} from 'react-native-ble-manager';
 import {
   Alert,
   NativeEventEmitter,
@@ -9,9 +9,21 @@ import {
   PermissionsAndroid,
   Platform,
 } from 'react-native';
-import BleManager, {Peripheral} from 'react-native-ble-manager';
-import {showMessage} from 'react-native-flash-message';
-import {byteToString} from '../utils/binaryFormatters';
+import {SocketResponse, Sockets} from '../types';
+
+type DefaultContext = {
+  stopScan: () => void;
+  isPairing: boolean;
+  isScanning: boolean;
+  socketInfo?: Sockets;
+  scanAvailableDevices: () => void;
+  peripherals: Map<string, Peripheral>;
+  characteristics?: PeripheralServices;
+  connectPeripheral: (peripheral: Peripheral) => void;
+  disconnectPeripheral: (peripheralId: string) => void;
+  read: (services: PeripheralServices) => Promise<number[]>;
+  write: (data: any, services: PeripheralServices) => Promise<void>;
+};
 
 declare module 'react-native-ble-manager' {
   // enrich local contract with custom state properties needed by App.tsx
@@ -35,21 +47,41 @@ type PeripheralServices = {
   receive: string;
 };
 
-type UseBle = {
-  updateListener?: (value: string) => void;
+type BluetoothContextProvider = {
+  children: React.ReactNode;
 };
 
-export const useBle = (updateListener?: UseBle['updateListener']) => {
+export const BluetoothContext = createContext<DefaultContext>({
+  read: async () => [],
+  write: async () => undefined,
+  stopScan: () => undefined,
+  isPairing: false,
+  isScanning: false,
+  socketInfo: {
+    SCK0002: undefined,
+    SCK0001: undefined,
+  },
+  peripherals: new Map<Peripheral['id'], Peripheral>(),
+  characteristics: undefined,
+  connectPeripheral: () => undefined,
+  disconnectPeripheral: () => undefined,
+  scanAvailableDevices: () => undefined,
+});
+
+export const BluetoothContextProvider: React.FunctionComponent<
+  BluetoothContextProvider
+> = ({children}) => {
   const [isScanning, setIsScanning] = useState(false);
   const [isPairing, setIsPairing] = useState(false);
   const [peripherals, setPeripherals] = useState<Map<string, Peripheral>>(
     new Map<Peripheral['id'], Peripheral>(),
   );
-  const [characteristics, setCharacteristics] = useState<PeripheralServices>({
-    peripheralId: '',
-    serviceId: '',
-    transfer: '',
-    receive: '',
+  const [characteristics, setCharacteristics] = useState<
+    PeripheralServices | undefined
+  >(undefined);
+  const [socketInfo, setSocketInfo] = useState<Sockets>({
+    SCK0002: undefined,
+    SCK0001: undefined,
   });
 
   const handleLocationPermission = async () => {
@@ -63,16 +95,8 @@ export const useBle = (updateListener?: UseBle['updateListener']) => {
       }
     }
   };
-
   useEffect(() => {
-    console.log('====================================');
-    console.log(
-      new TextEncoder().encode(JSON.stringify({id: 'SCK0001', cmd: 'on'})),
-    );
-    console.log('====================================');
-
     handleLocationPermission();
-
     BleManager.checkState().then(state => {
       if (state !== 'on') {
         BleManager.enableBluetooth().then(() => {
@@ -95,8 +119,8 @@ export const useBle = (updateListener?: UseBle['updateListener']) => {
         const regex = /\s*smart\s*socket\s*ble\s*/i;
         const localName = peripheral.advertising?.localName;
         if (localName && regex.test(localName)) {
-          console.log(peripheral);
           console.log(`Found match for "${wordToMatch}" in localName`);
+          console.log(peripheral);
           setPeripherals(map => {
             return new Map(map.set(peripheral.id, peripheral));
           });
@@ -113,25 +137,26 @@ export const useBle = (updateListener?: UseBle['updateListener']) => {
 
     let listenedForUpdates = BleManagerEmitter.addListener(
       'BleManagerDidUpdateValueForCharacteristic',
-      ({value}) => {
-        console.log(
-          '=================BleManagerDidUpdateValueForCharacteristic===================',
-        );
-        console.log(byteToString(value));
-        console.log('====================================');
-        // const formatted = byteToString(value);
-        // if (formatted === 'error') {
-        //   showMessage({
-        //     message: 'An Error occurred try again',
-        //     type: 'danger',
-        //   });
-        //   return;
-        // }
-        if (updateListener) {
-          updateListener(formatted);
+      () => {
+        if (characteristics) {
+          read(characteristics);
         }
       },
     );
+    BleManager.getConnectedPeripherals([]).then(connectedPeripherals => {
+      // Success code
+      const discoveredDevice = Array.from(connectedPeripherals.values())[0];
+      if (Array.from(peripherals.values()).length < 1 && discoveredDevice) {
+        connectPeripheral({
+          advertising: discoveredDevice?.advertising,
+          id: discoveredDevice?.id,
+          rssi: discoveredDevice?.rssi,
+        });
+        setPeripherals(map => {
+          return new Map(map.set(discoveredDevice.id, discoveredDevice));
+        });
+      }
+    });
 
     return () => {
       listenedForUpdates.remove();
@@ -139,13 +164,14 @@ export const useBle = (updateListener?: UseBle['updateListener']) => {
       stopScanListener.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [characteristics]);
 
   const scanAvailableDevices = () => {
     PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
     ).then(() => {
       setPeripherals(new Map());
+      console.log('scanAvailableDevices');
       if (!isScanning) {
         BleManager.scan([], 1, true)
           .then(() => {
@@ -166,15 +192,22 @@ export const useBle = (updateListener?: UseBle['updateListener']) => {
         await sleep(900);
         const peripheralData = await BleManager.retrieveServices(peripheral.id);
         if (peripheralData.characteristics) {
-          setCharacteristics({
+          const response = {
             peripheralId: peripheral.id,
             serviceId: peripheralData.characteristics[7].service,
             transfer: peripheralData.characteristics[6].characteristic,
             receive: peripheralData.characteristics[7].characteristic,
-          });
+          };
+          setCharacteristics(response);
+          await BleManager.startNotification(
+            response.peripheralId,
+            response.serviceId,
+            response.transfer,
+          );
           showMessage({
             message: `Connected to ${peripheral.name ?? peripheral.id} `,
             type: 'success',
+            position: 'bottom',
           });
         }
       }
@@ -190,6 +223,13 @@ export const useBle = (updateListener?: UseBle['updateListener']) => {
 
   const disconnectPeripheral = async (peripheralId: string) => {
     await BleManager.disconnect(peripheralId);
+    setCharacteristics(undefined);
+    setPeripherals(new Map());
+    showMessage({
+      message: 'Disconnected successfully',
+      type: 'success',
+      position: 'bottom',
+    });
   };
 
   const stopScan = async () => {
@@ -198,17 +238,19 @@ export const useBle = (updateListener?: UseBle['updateListener']) => {
   };
 
   const write = async (data: any, services: PeripheralServices) => {
-    await BleManager.writeWithoutResponse(
-      services.peripheralId,
-      services.serviceId,
-      services.receive,
-      data,
-    );
-    await BleManager.startNotification(
-      services.peripheralId,
-      services.serviceId,
-      services.transfer,
-    );
+    console.log(services);
+    try {
+      await BleManager.write(
+        services.peripheralId,
+        services.serviceId,
+        services.receive,
+        data,
+      );
+    } catch (error) {
+      console.log('============error========================');
+      console.log(error);
+      console.log('====================================');
+    }
   };
 
   const read = async (services: PeripheralServices) => {
@@ -218,22 +260,42 @@ export const useBle = (updateListener?: UseBle['updateListener']) => {
       services.transfer,
     );
 
-    console.log('==========read==========================');
-    console.log(byteToString(response));
+    const formattedPayload = JSON.parse(
+      byteToString(response),
+    ) as SocketResponse;
+    Object.keys(formattedPayload).forEach((field: string) => {
+      setSocketInfo(info => ({
+        ...info,
+        [field]: formattedPayload[field],
+      }));
+    });
+    console.log('============formattedPayload========================');
+    console.log(formattedPayload);
     console.log('====================================');
     return response;
   };
 
-  return {
+  const contextValues = {
     read,
     write,
     stopScan,
     isPairing,
     isScanning,
     peripherals,
+    socketInfo,
     characteristics,
     connectPeripheral,
     disconnectPeripheral,
     scanAvailableDevices,
   };
+
+  return (
+    <BluetoothContext.Provider value={contextValues}>
+      {children}
+    </BluetoothContext.Provider>
+  );
+};
+
+export const useBluetoothContext = () => {
+  return useContext(BluetoothContext);
 };

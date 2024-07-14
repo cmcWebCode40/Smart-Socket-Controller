@@ -6,26 +6,38 @@ import {LargePlugIcon, SwitchIcon, Typography} from '../common';
 import {fontPixel, pixelSizeHorizontal, pixelSizeVertical} from '@/libs/utils';
 import {colors} from '@/libs/constants';
 import LineImage from '../../../assets/images/line.png';
+import {SocketIdentifiers} from '@/libs/types';
 
 interface EnergyDeviceCardProps {
-  state: 'online' | 'offline';
-  onViewDetails: () => void;
+  state: 'on' | 'off';
+  voltage: number;
+  power: number;
+  onViewDetails: (id: SocketIdentifiers) => void;
+  socketId: string;
+  socketNo: string;
 }
 
 export const EnergyDeviceCard: React.FunctionComponent<
   EnergyDeviceCardProps
-> = ({onViewDetails, state}) => {
+> = ({onViewDetails, state, power, voltage, socketId, socketNo}) => {
   const {green, red} = colors;
   const mainStyle = useThemedStyles(styles);
-  const isOnline = state === 'online';
+
+  const isOnline = state === 'on';
+
   return (
-    <TouchableOpacity onPress={onViewDetails} style={mainStyle.container}>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={() => onViewDetails(socketId as SocketIdentifiers)}
+      style={mainStyle.container}>
       <View style={mainStyle.cardHeader}>
         <View style={mainStyle.subHeader}>
           <LargePlugIcon />
-          <View style={mainStyle.iconText}>
-            <Typography style={mainStyle.headerTitle}>Socket 1</Typography>
-            <Typography style={mainStyle.caption}>SCK0001</Typography>
+          <View>
+            <Typography style={mainStyle.headerTitle}>
+              Socket {socketNo}
+            </Typography>
+            <Typography style={mainStyle.caption}>{socketId}</Typography>
           </View>
         </View>
         <View
@@ -38,19 +50,23 @@ export const EnergyDeviceCard: React.FunctionComponent<
               mainStyle.statusText,
               {color: isOnline ? green[600] : red[200]},
             ]}>
-            SCK0001
+            {socketId}
           </Typography>
         </View>
       </View>
       <View style={mainStyle.footer}>
         <View>
-          <Typography style={mainStyle.title}>50% Optimized</Typography>
+          <Typography style={mainStyle.title}>Optimized</Typography>
         </View>
         <Image source={LineImage} />
         <View>
-          <Typography style={mainStyle.reading}>50.0KWh</Typography>
-          <Typography style={mainStyle.reading}>220V</Typography>
-          <SwitchIcon />
+          <Typography variant="b1" style={mainStyle.reading}>
+            {power} KWh
+          </Typography>
+          <Typography variant="b1" style={mainStyle.reading}>
+            {voltage} V
+          </Typography>
+          <SwitchIcon state={state} style={mainStyle.switch} />
         </View>
       </View>
     </TouchableOpacity>
@@ -75,8 +91,9 @@ const styles = (theme: Theme) => {
       paddingVertical: pixelSizeVertical(16),
     },
     headerTitle: {
-      fontSize: fontPixel(32),
-      fontFamily: theme.fonts.ManropeExtraBold,
+      fontSize: fontPixel(28),
+      textTransform: 'capitalize',
+      fontFamily: theme.fonts.ManropeBold,
     },
     status: {
       borderRadius: theme.radius.xxl,
@@ -86,13 +103,11 @@ const styles = (theme: Theme) => {
       marginRight: pixelSizeHorizontal(8),
     },
     statusText: {
+      textTransform: 'uppercase',
       fontSize: fontPixel(theme.fontSize.s),
     },
     subHeader: {
       flexDirection: 'row',
-    },
-    iconText: {
-      // marginTop: pixelSizeVertical(8),
     },
     caption: {
       marginTop: pixelSizeVertical(12),
@@ -128,6 +143,9 @@ const styles = (theme: Theme) => {
     reading: {
       fontFamily: theme.fonts.ManropeBold,
       color: theme.colors.orange[400],
+    },
+    switch: {
+      marginTop: pixelSizeVertical(8),
     },
   });
 };

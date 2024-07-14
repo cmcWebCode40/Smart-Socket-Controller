@@ -8,37 +8,96 @@ import {
   HomeRoundedIcon,
   Typography,
 } from '@/components/common';
-import {pixelSizeHorizontal, pixelSizeVertical} from '@/libs/utils';
+import {fontPixel, pixelSizeHorizontal, pixelSizeVertical} from '@/libs/utils';
 import PrintedCircuitBoardImage from '../../assets/images/pc_board.png';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackScreens} from '@/navigation/type';
+import {useBluetoothContext} from '@/libs/context';
+import {Spinner} from '@/components/common/loader/index.';
 
 export const AddDeviceScreen: React.FunctionComponent = () => {
   const style = useThemedStyles(styles);
+  const {
+    scanAvailableDevices,
+    peripherals,
+    isScanning,
+    isPairing,
+    disconnectPeripheral,
+    connectPeripheral,
+    characteristics,
+  } = useBluetoothContext();
+
+  const discoveredDevice = Array.from(peripherals.values())[0];
+
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackScreens>>();
   const navigateToDashboard = () => {
     navigation.navigate('Dashboard');
   };
+
+  const handleDevicePairing = () => {
+    if (discoveredDevice) {
+      connectPeripheral({
+        advertising: discoveredDevice?.advertising,
+        id: discoveredDevice?.id,
+        rssi: discoveredDevice?.rssi,
+      });
+    }
+  };
+
+  const handleBleConnect = () => {
+    if (characteristics?.peripheralId) {
+      disconnectPeripheral(characteristics.peripheralId);
+      return;
+    }
+    scanAvailableDevices();
+  };
+
+  console.log(discoveredDevice);
+
+  const bleView = discoveredDevice ? (
+    <View style={[style.innerContent, style.boxShadow]}>
+      <Typography style={style.scanText}>
+        {characteristics ? 'Connected' : 'Device Found'}
+      </Typography>
+      <Typography style={style.scanSubText}>(Click to connect)</Typography>
+      <Image source={PrintedCircuitBoardImage} style={style.image} />
+      <Typography style={style.bleText}>
+        {isPairing ? 'Pairing...' : discoveredDevice.name}
+      </Typography>
+    </View>
+  ) : (
+    <View style={style.noDevice}>
+      <Typography style={[style.scanText]}>
+        No Device Found, Try again.{' '}
+      </Typography>
+    </View>
+  );
+
   return (
     <View style={style.container}>
       <Button
         style={style.button}
         textStyles={style.buttonText}
+        onPress={handleBleConnect}
         variant="outlined">
-        Add Device
+        {characteristics?.serviceId ? ' Disconnect' : 'Add Device'}
       </Button>
       <View style={style.bleIcon}>
         <BluetoothAudioIcon />
       </View>
-      <View style={[style.content, style.boxShadow]}>
-        <View style={[style.innerContent, style.boxShadow]}>
-          <Typography style={style.scanText}>1 Device Found</Typography>
-          <Image source={PrintedCircuitBoardImage} style={style.image} />
-          <Typography style={style.bleText}>ESP32 HUB BLE</Typography>
-        </View>
-      </View>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        disabled={!discoveredDevice}
+        onPress={discoveredDevice && handleDevicePairing}
+        style={[style.content, style.boxShadow]}>
+        {isScanning ? (
+          <Spinner loading title="Scanning please wait ." />
+        ) : (
+          bleView
+        )}
+      </TouchableOpacity>
       <TouchableOpacity style={style.homeIcon} onPress={navigateToDashboard}>
         <HomeRoundedIcon />
       </TouchableOpacity>
@@ -46,6 +105,10 @@ export const AddDeviceScreen: React.FunctionComponent = () => {
   );
 };
 
+// const data = new TextEncoder().encode(
+//   JSON.stringify({id: 'SCK0002', cmd: 'off'}),
+// );
+// write(data, characteristics);
 const styles = (theme: Theme) => {
   return StyleSheet.create({
     container: {
@@ -100,13 +163,13 @@ const styles = (theme: Theme) => {
     bleText: {
       margin: 'auto',
       marginTop: '0%',
-      marginBottom: '10%',
+      marginBottom: '8%',
     },
     scanText: {
       marginTop: '10%',
       marginHorizontal: 'auto',
       marginBottom: '0%',
-      color: theme.colors.gray[500],
+      color: theme.colors.black[200],
     },
     homeIcon: {
       marginTop: pixelSizeVertical(24),
@@ -116,6 +179,21 @@ const styles = (theme: Theme) => {
       top: '40%',
       zIndex: 999,
       marginLeft: pixelSizeHorizontal(4),
+    },
+    connectButton: {
+      marginTop: pixelSizeVertical(24),
+    },
+    noDevice: {
+      justifyContent: 'center',
+      textAlign: 'center',
+      alignItems: 'center',
+      marginVertical: 'auto',
+    },
+    scanSubText: {
+      textAlign: 'center',
+      color: theme.colors.black[200],
+      fontSize: fontPixel(14),
+      fontWeight: '700',
     },
   });
 };

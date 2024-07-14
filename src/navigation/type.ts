@@ -1,7 +1,11 @@
+import {SocketIdentifiers} from '@/libs/types';
+
 export type RootStackScreens = {
   Account: undefined;
   AddDevice: undefined;
   Devices: undefined;
   Dashboard: undefined;
-  DeviceDetails: undefined;
+  DeviceDetails: {
+    socketId: SocketIdentifiers;
+  };
 };

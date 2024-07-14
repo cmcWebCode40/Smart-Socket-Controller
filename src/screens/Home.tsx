@@ -7,7 +7,7 @@ import {
   pixelSizeHorizontal,
   pixelSizeVertical,
 } from '@/libs/utils';
-import {colors} from '@/libs/constants';
+import {Socket, colors} from '@/libs/constants';
 import {EnergyUsageChart} from '@/components/chart';
 import {Button, Typography} from '@/components/common';
 import {MinimalEnergyDeviceCard} from '@/components/energy-device-cards';
@@ -15,14 +15,17 @@ import {EnergyUsageProgressIndicator} from '@/components/energy-usage-progress-i
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackScreens} from '@/navigation/type';
+import {useBluetoothContext} from '@/libs/context';
+import {SocketIdentifiers} from '@/libs/types';
 
 export const HomeScreen: React.FunctionComponent = () => {
   const style = useThemedStyles(styles);
+  const {socketInfo} = useBluetoothContext();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackScreens>>();
 
-  const handleViewDetails = () => {
-    navigation.navigate('DeviceDetails');
+  const handleViewDetails = (socketId: SocketIdentifiers) => {
+    navigation.navigate('DeviceDetails', {socketId});
   };
 
   return (
@@ -65,13 +68,26 @@ export const HomeScreen: React.FunctionComponent = () => {
             High Usage Device
           </Typography>
           <View style={style.connectDeviceList}>
-            {['Socket 1', 'Socket 2'].map((item, index) => (
+            {socketInfo?.SCK0001 && (
               <MinimalEnergyDeviceCard
-                index={index}
+                index={0}
+                socketNo={'1'}
+                socketId={Socket.SCK0001}
+                power={socketInfo.SCK0001.power}
                 onViewDetails={handleViewDetails}
                 style={style.connectedDeviceCard}
               />
-            ))}
+            )}
+            {socketInfo?.SCK0002 && (
+              <MinimalEnergyDeviceCard
+                index={1}
+                socketNo={'2'}
+                socketId={Socket.SCK0002}
+                power={socketInfo.SCK0002.power}
+                onViewDetails={handleViewDetails}
+                style={style.connectedDeviceCard}
+              />
+            )}
           </View>
         </View>
       </ScrollView>

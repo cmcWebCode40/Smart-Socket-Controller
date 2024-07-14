@@ -4,7 +4,7 @@ import {
   StyleProp,
   ViewStyle,
   Image,
-  Pressable,
+  TouchableOpacity,
 } from 'react-native';
 import React from 'react';
 import {useThemedStyles} from '@/libs/hooks';
@@ -13,37 +13,44 @@ import {PlugIcon, SwitchIcon, Typography} from '../common';
 import {fontPixel, pixelSizeVertical} from '@/libs/utils';
 import TriangleImage from '../../../assets/images/triangle.png';
 import {colors} from '@/libs/constants';
+import {SocketIdentifiers} from '@/libs/types';
 
 interface MinimalEnergyDeviceCardProps {
   style?: StyleProp<ViewStyle>;
   index: number;
-  onViewDetails: () => void;
+  socketId: string;
+  socketNo: string;
+  power: number;
+  onViewDetails: (id: SocketIdentifiers) => void;
 }
 
 export const MinimalEnergyDeviceCard: React.FunctionComponent<
   MinimalEnergyDeviceCardProps
-> = ({style, index, onViewDetails}) => {
+> = ({style, index, power, socketId, socketNo, onViewDetails}) => {
   const mainStyle = useThemedStyles(styles);
   const textColor = index % 2 === 0 ? colors.orange[400] : colors.green[300];
   return (
-    <Pressable onPress={onViewDetails} style={[mainStyle.wrapper, style]}>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={() => onViewDetails(socketId as SocketIdentifiers)}
+      style={[mainStyle.wrapper, style]}>
       <Image source={TriangleImage} style={mainStyle.image} />
       <View style={mainStyle.container}>
         <View style={[mainStyle.flexDir, mainStyle.cardHeader]}>
           <PlugIcon />
           <Typography style={[mainStyle.powerRating, {color: textColor}]}>
-            200KWh
+            {power} KWh
           </Typography>
         </View>
         <View style={mainStyle.flexDir}>
           <View>
-            <Typography style={mainStyle.title}>Socket 1</Typography>
-            <Typography style={mainStyle.deviceId}>SCK0001</Typography>
+            <Typography style={mainStyle.title}>Socket {socketNo}</Typography>
+            <Typography style={mainStyle.deviceId}>{socketId}</Typography>
           </View>
-          <SwitchIcon />
+          <SwitchIcon state="off" />
         </View>
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 };
 
@@ -85,6 +92,7 @@ const styles = (theme: Theme) => {
       marginBottom: pixelSizeVertical(8),
     },
     deviceId: {
+      textTransform: 'uppercase',
       fontSize: fontPixel(theme.fontSize.s),
     },
     flexDir: {
