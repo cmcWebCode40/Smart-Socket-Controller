@@ -20,13 +20,16 @@ import {SocketIdentifiers} from '@/libs/types';
 
 export const HomeScreen: React.FunctionComponent = () => {
   const style = useThemedStyles(styles);
-  const {socketInfo} = useBluetoothContext();
+  const {socketInfo, socketPowerControl} = useBluetoothContext();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackScreens>>();
 
   const handleViewDetails = (socketId: SocketIdentifiers) => {
     navigation.navigate('DeviceDetails', {socketId});
   };
+  const socket1 = socketInfo?.SCK0001?.energy ?? 0;
+  const socket2 = socketInfo?.SCK0002?.energy ?? 0;
+  const totalPowerConsumption = Math.round(socket1 + socket2 * 100);
 
   return (
     <View style={style.container}>
@@ -42,7 +45,7 @@ export const HomeScreen: React.FunctionComponent = () => {
           </Button>
         </View>
         <View style={style.progressIndicatorContainer}>
-          <EnergyUsageProgressIndicator />
+          <EnergyUsageProgressIndicator power={totalPowerConsumption} />
         </View>
         <View style={style.devices}>
           {['Socket 1', 'Socket 2'].map((item, index) => (
@@ -72,6 +75,8 @@ export const HomeScreen: React.FunctionComponent = () => {
               <MinimalEnergyDeviceCard
                 index={0}
                 socketNo={'1'}
+                state={socketInfo.SCK0001.status}
+                onSwitch={socketPowerControl}
                 socketId={Socket.SCK0001}
                 power={socketInfo.SCK0001.power}
                 onViewDetails={handleViewDetails}
@@ -82,7 +87,9 @@ export const HomeScreen: React.FunctionComponent = () => {
               <MinimalEnergyDeviceCard
                 index={1}
                 socketNo={'2'}
+                onSwitch={socketPowerControl}
                 socketId={Socket.SCK0002}
+                state={socketInfo.SCK0002.status}
                 power={socketInfo.SCK0002.power}
                 onViewDetails={handleViewDetails}
                 style={style.connectedDeviceCard}

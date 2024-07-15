@@ -38,9 +38,6 @@ export const EnergyUsageProgressIndicator: React.FunctionComponent<
         <View style={style.content}>
           <WireLessIcon color={wirelessColor} />
           <Typography variant="h1">{power} Wh</Typography>
-          <Typography variant="h2" style={style.subTitle}>
-            0% of the Limit
-          </Typography>
           <Typography variant="b1" style={style.tag}>
             Energy Usage
           </Typography>

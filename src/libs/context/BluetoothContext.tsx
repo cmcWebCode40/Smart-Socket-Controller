@@ -1,6 +1,6 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
 import {showMessage} from 'react-native-flash-message';
-import {byteToString} from '../utils/binaryFormatters';
+import {byteToString, stringToCharCodeArray} from '../utils/binaryFormatters';
 import BleManager, {Peripheral} from 'react-native-ble-manager';
 import {
   Alert,
@@ -10,16 +10,18 @@ import {
   Platform,
 } from 'react-native';
 import {SocketResponse, Sockets} from '../types';
+import {Socket} from '../constants';
 
 type DefaultContext = {
   stopScan: () => void;
   isPairing: boolean;
   isScanning: boolean;
-  socketInfo?: Sockets;
+  socketInfo: Sockets;
   scanAvailableDevices: () => void;
   peripherals: Map<string, Peripheral>;
   characteristics?: PeripheralServices;
   connectPeripheral: (peripheral: Peripheral) => void;
+  socketPowerControl: (socketId: string, state: 'on' | 'off' | 'r') => void;
   disconnectPeripheral: (peripheralId: string) => void;
   read: (services: PeripheralServices) => Promise<number[]>;
   write: (data: any, services: PeripheralServices) => Promise<void>;
@@ -63,6 +65,7 @@ export const BluetoothContext = createContext<DefaultContext>({
   },
   peripherals: new Map<Peripheral['id'], Peripheral>(),
   characteristics: undefined,
+  socketPowerControl: () => undefined,
   connectPeripheral: () => undefined,
   disconnectPeripheral: () => undefined,
   scanAvailableDevices: () => undefined,
@@ -109,7 +112,7 @@ export const BluetoothContextProvider: React.FunctionComponent<
     });
 
     BleManager.start({showAlert: false}).then(() => {
-      console.log('BleManager initialized');
+      console.info('BleManager initialized');
     });
 
     let stopDiscoverListener = BleManagerEmitter.addListener(
@@ -119,8 +122,7 @@ export const BluetoothContextProvider: React.FunctionComponent<
         const regex = /\s*smart\s*socket\s*ble\s*/i;
         const localName = peripheral.advertising?.localName;
         if (localName && regex.test(localName)) {
-          console.log(`Found match for "${wordToMatch}" in localName`);
-          console.log(peripheral);
+          console.info(`Found match for "${wordToMatch}" in localName`);
           setPeripherals(map => {
             return new Map(map.set(peripheral.id, peripheral));
           });
@@ -171,14 +173,16 @@ export const BluetoothContextProvider: React.FunctionComponent<
       PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
     ).then(() => {
       setPeripherals(new Map());
-      console.log('scanAvailableDevices');
       if (!isScanning) {
         BleManager.scan([], 1, true)
           .then(() => {
             setIsScanning(true);
           })
           .catch(error => {
-            console.error(error);
+            showMessage({
+              message: error?.toString(),
+              type: 'danger',
+            });
           });
       }
     });
@@ -225,6 +229,10 @@ export const BluetoothContextProvider: React.FunctionComponent<
     await BleManager.disconnect(peripheralId);
     setCharacteristics(undefined);
     setPeripherals(new Map());
+    setSocketInfo({
+      SCK0002: undefined,
+      SCK0001: undefined,
+    });
     showMessage({
       message: 'Disconnected successfully',
       type: 'success',
@@ -238,7 +246,6 @@ export const BluetoothContextProvider: React.FunctionComponent<
   };
 
   const write = async (data: any, services: PeripheralServices) => {
-    console.log(services);
     try {
       await BleManager.write(
         services.peripheralId,
@@ -247,9 +254,7 @@ export const BluetoothContextProvider: React.FunctionComponent<
         data,
       );
     } catch (error) {
-      console.log('============error========================');
-      console.log(error);
-      console.log('====================================');
+      Alert.alert(error?.toString() as string);
     }
   };
 
@@ -264,15 +269,44 @@ export const BluetoothContextProvider: React.FunctionComponent<
       byteToString(response),
     ) as SocketResponse;
     Object.keys(formattedPayload).forEach((field: string) => {
-      setSocketInfo(info => ({
-        ...info,
-        [field]: formattedPayload[field],
-      }));
+      if (field === Socket.SCK0001) {
+        setSocketInfo(info => ({
+          ...info,
+          SCK0001: formattedPayload[field],
+        }));
+      }
+      if (field === Socket.SCK0002) {
+        setSocketInfo(info => ({
+          ...info,
+          SCK0002: formattedPayload[field],
+        }));
+      }
     });
-    console.log('============formattedPayload========================');
-    console.log(formattedPayload);
-    console.log('====================================');
     return response;
+  };
+
+  const socketPowerControl = async (
+    socketId: string,
+    state: 'on' | 'off' | 'r',
+  ) => {
+    let socketCommand = '';
+    if (Socket.SCK0001 === socketId) {
+      socketCommand = '1';
+    }
+    if (Socket.SCK0002 === socketId) {
+      socketCommand = '2';
+    }
+    const byteArray = stringToCharCodeArray(
+      JSON.stringify({id: socketCommand, c: state}),
+    );
+    if (characteristics) {
+      await write(byteArray, characteristics);
+      showMessage({
+        message: `Socket ${socketId} successfully ${state}`,
+        type: 'success',
+        position: 'bottom',
+      });
+    }
   };
 
   const contextValues = {
@@ -285,6 +319,7 @@ export const BluetoothContextProvider: React.FunctionComponent<
     socketInfo,
     characteristics,
     connectPeripheral,
+    socketPowerControl,
     disconnectPeripheral,
     scanAvailableDevices,
   };

@@ -3,7 +3,7 @@ export const stringToCharCodeArray = (text: string) => {
   for (let i = 0; i < 16; i++) {
     data.push(0);
   }
-  for (let i = 0; i < text.length && i < 16; i++) {
+  for (let i = 0; i < text.length; i++) {
     data[i] = text.charCodeAt(i);
   }
   return data;

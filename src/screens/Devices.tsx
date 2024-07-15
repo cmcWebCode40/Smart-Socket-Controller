@@ -10,11 +10,10 @@ import {RootStackScreens} from '@/navigation/type';
 import {useBluetoothContext} from '@/libs/context';
 import {Socket} from '@/libs/constants';
 import {SocketIdentifiers} from '@/libs/types';
-import {Button} from '@/components/common';
 
 export const DevicesScreen: React.FunctionComponent = () => {
   const style = useThemedStyles(styles);
-  const {write, socketInfo, characteristics} = useBluetoothContext();
+  const {socketInfo, socketPowerControl} = useBluetoothContext();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackScreens>>();
 
@@ -24,25 +23,14 @@ export const DevicesScreen: React.FunctionComponent = () => {
     });
   };
 
-  const socketPowerControl = () => {
-    const payload = {id: 'SCK0002', cmd: 'off'};
-    const uint8Array = new TextEncoder().encode(JSON.stringify(payload));
-
-    const byteArray = Array.from(uint8Array);
-
-    if (characteristics) {
-      write(byteArray, characteristics);
-    }
-  };
-
   return (
     <View style={style.container}>
-      <Button onPress={socketPowerControl}>Send</Button>
       <View style={style.content}>
         {socketInfo?.SCK0001 && (
           <EnergyDeviceCard
             socketNo={'1'}
             socketId={Socket.SCK0001}
+            onSwitch={socketPowerControl}
             power={socketInfo.SCK0001.power}
             state={socketInfo.SCK0001.status}
             voltage={socketInfo.SCK0001.voltage}
@@ -53,6 +41,7 @@ export const DevicesScreen: React.FunctionComponent = () => {
           <EnergyDeviceCard
             socketNo={'2'}
             socketId={Socket.SCK0002}
+            onSwitch={socketPowerControl}
             power={socketInfo.SCK0002.power}
             state={socketInfo.SCK0002.status}
             voltage={socketInfo.SCK0002.voltage}
