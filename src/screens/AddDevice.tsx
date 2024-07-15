@@ -54,8 +54,6 @@ export const AddDeviceScreen: React.FunctionComponent = () => {
     scanAvailableDevices();
   };
 
-  console.log(discoveredDevice);
-
   const bleView = discoveredDevice ? (
     <View style={[style.innerContent, style.boxShadow]}>
       <Typography style={style.scanText}>

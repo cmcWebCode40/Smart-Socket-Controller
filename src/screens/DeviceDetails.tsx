@@ -4,7 +4,7 @@ import {useThemedStyles} from '@/libs/hooks';
 import {Theme} from '@/libs/config/theme';
 import {fontPixel, pixelSizeHorizontal, pixelSizeVertical} from '@/libs/utils';
 import {Header} from '@/components/common/header';
-import {Button, Modal, Typography, WarningIcon} from '@/components/common';
+import {Button, Modal, Typography} from '@/components/common';
 import {EnergyUsageProgressIndicator} from '@/components/energy-usage-progress-indicator';
 import {
   DeviceInfoStatus,
@@ -26,9 +26,13 @@ export const DeviceDetailsScreen: React.FunctionComponent<
 > = ({route: {params}}) => {
   const [openModal, setOpenModal] = useState(false);
   const style = useThemedStyles(styles);
-  const {write, socketInfo, characteristics} = useBluetoothContext();
+  const {socketInfo, socketPowerControl} = useBluetoothContext();
 
-  const socket = socketInfo && (socketInfo[params.socketId] as SocketInfo);
+  const socket = socketInfo[params.socketId] as SocketInfo;
+
+  if (!socket) {
+    return null;
+  }
 
   const info: {type: DeviceInfoStatus; value: string}[] = [
     {
@@ -49,17 +53,10 @@ export const DeviceDetailsScreen: React.FunctionComponent<
     },
   ];
 
-  if (!socket) {
-    return null;
-  }
+  const energyUsage = Math.round(socket.energy * 100);
 
   const resetSocket = () => {
-    const payload = {id: socket.id, cmd: 'reset'};
-    const uint8Array = new TextEncoder().encode(JSON.stringify(payload));
-    const byteArray = Array.from(uint8Array);
-    if (characteristics) {
-      write(byteArray, characteristics);
-    }
+    socketPowerControl(socket.id, 'r');
   };
 
   return (
@@ -84,7 +81,7 @@ export const DeviceDetailsScreen: React.FunctionComponent<
           </View>
         </View>
         <View style={style.progressIndicatorContainer}>
-          <EnergyUsageProgressIndicator power={socket.power} invertColor />
+          <EnergyUsageProgressIndicator power={energyUsage} invertColor />
         </View>
         <View style={style.infoContainer}>
           {info.map((item, index) => (
@@ -96,14 +93,6 @@ export const DeviceDetailsScreen: React.FunctionComponent<
           ))}
         </View>
         <View style={style.buttonContainer}>
-          <Button
-            variant="outlined"
-            style={style.limit}
-            prefixIcon={<WarningIcon />}
-            onPress={() => setOpenModal(true)}
-            textStyles={style.limitTextStyle}>
-            Set Load Limit
-          </Button>
           <Button
             variant="outlined"
             style={style.reset}
@@ -210,7 +199,7 @@ const styles = (theme: Theme) => {
       fontSize: fontPixel(theme.fontSize.xl),
     },
     buttonContainer: {
-      marginTop: pixelSizeVertical(40),
+      marginTop: pixelSizeVertical(24),
       marginBottom: pixelSizeVertical(24),
     },
   });
