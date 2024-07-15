@@ -1,5 +1,5 @@
 import {View, StyleSheet, TouchableOpacity, Image} from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {useThemedStyles} from '@/libs/hooks';
 import {Theme} from '@/libs/config/theme';
 import {LargePlugIcon, SwitchIcon, Typography} from '../common';
@@ -15,15 +15,25 @@ interface EnergyDeviceCardProps {
   onViewDetails: (id: SocketIdentifiers) => void;
   socketId: string;
   socketNo: string;
+  onSwitch: (socketId: string, state: 'on' | 'off') => void;
 }
 
 export const EnergyDeviceCard: React.FunctionComponent<
   EnergyDeviceCardProps
-> = ({onViewDetails, state, power, voltage, socketId, socketNo}) => {
+> = ({onViewDetails, state, power, voltage, socketId, socketNo, onSwitch}) => {
   const {green, red} = colors;
+  const [isEnabled, setIsEnabled] = useState(false);
   const mainStyle = useThemedStyles(styles);
 
+  useEffect(() => {
+    if (state === 'on') {
+      setIsEnabled(true);
+    }
+  }, [state]);
+
   const isOnline = state === 'on';
+
+  const switchValue = state === 'off' ? 'on' : 'off';
 
   return (
     <TouchableOpacity
@@ -66,7 +76,15 @@ export const EnergyDeviceCard: React.FunctionComponent<
           <Typography variant="b1" style={mainStyle.reading}>
             {voltage} V
           </Typography>
-          <SwitchIcon state={state} style={mainStyle.switch} />
+          <SwitchIcon
+            state={state}
+            isEnabled={isEnabled}
+            style={mainStyle.switch}
+            onChange={() => {
+              setIsEnabled(state === 'off' ? true : false);
+              onSwitch(socketId, switchValue);
+            }}
+          />
         </View>
       </View>
     </TouchableOpacity>
@@ -89,9 +107,10 @@ const styles = (theme: Theme) => {
       borderColor: theme.colors.green[300],
       backgroundColor: theme.colors.gray[100],
       paddingVertical: pixelSizeVertical(16),
+      marginBottom: pixelSizeVertical(24),
     },
     headerTitle: {
-      fontSize: fontPixel(28),
+      fontSize: fontPixel(24),
       textTransform: 'capitalize',
       fontFamily: theme.fonts.ManropeBold,
     },
@@ -112,6 +131,7 @@ const styles = (theme: Theme) => {
     caption: {
       marginTop: pixelSizeVertical(12),
       color: theme.colors.gray[500],
+      fontSize: fontPixel(16),
     },
     cardHeader: {
       alignItems: 'flex-start',

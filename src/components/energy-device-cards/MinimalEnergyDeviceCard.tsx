@@ -6,7 +6,7 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {useThemedStyles} from '@/libs/hooks';
 import {Theme} from '@/libs/config/theme';
 import {PlugIcon, SwitchIcon, Typography} from '../common';
@@ -21,14 +21,35 @@ interface MinimalEnergyDeviceCardProps {
   socketId: string;
   socketNo: string;
   power: number;
+  state: 'on' | 'off';
   onViewDetails: (id: SocketIdentifiers) => void;
+  onSwitch: (socketId: string, state: 'on' | 'off') => void;
 }
 
 export const MinimalEnergyDeviceCard: React.FunctionComponent<
   MinimalEnergyDeviceCardProps
-> = ({style, index, power, socketId, socketNo, onViewDetails}) => {
-  const mainStyle = useThemedStyles(styles);
+> = ({
+  style,
+  index,
+  power,
+  socketId,
+  socketNo,
+  state,
+  onViewDetails,
+  onSwitch,
+}) => {
   const textColor = index % 2 === 0 ? colors.orange[400] : colors.green[300];
+  const [isEnabled, setIsEnabled] = useState(false);
+  const mainStyle = useThemedStyles(styles);
+
+  useEffect(() => {
+    if (state === 'on') {
+      setIsEnabled(true);
+    }
+  }, [state]);
+
+  const switchValue = state === 'off' ? 'on' : 'off';
+
   return (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -47,7 +68,14 @@ export const MinimalEnergyDeviceCard: React.FunctionComponent<
             <Typography style={mainStyle.title}>Socket {socketNo}</Typography>
             <Typography style={mainStyle.deviceId}>{socketId}</Typography>
           </View>
-          <SwitchIcon state="off" />
+          <SwitchIcon
+            state={state}
+            isEnabled={isEnabled}
+            onChange={() => {
+              setIsEnabled(state === 'off' ? true : false);
+              onSwitch(socketId, switchValue);
+            }}
+          />
         </View>
       </View>
     </TouchableOpacity>
