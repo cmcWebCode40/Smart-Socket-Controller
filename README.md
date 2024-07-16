@@ -7,6 +7,29 @@ A React Native application that leverages Bluetooth Low Energy (BLE) to communic
 Take full control of your home’s energy consumption with the Smart Socket Controller app. This innovative app allows you to effortlessly manage and monitor your smart sockets from anywhere, ensuring efficient energy use and significant cost savings.
 
 
+## Technologies Used to Develop the Smart Socket Controller App 
+
+### Mobile App Development: 
+- React Native:  For building the cross-platform mobile app for both iOS and Android.
+- Visily:  For designing the user interface.
+
+
+### Communication Protocols: 
+- MQTT: For real-time communication between the app and the smart sockets.
+- ESP-NOW: For low-latency communication between the central hub and the socket nodes.
+- Wi-Fi: For connecting the hub to the internet and sending data to ThingSpeak.
+- Bluetooth (BLE): For local communication between the central hub and the mobile app.
+
+### Hardware: 
+- ESP32 Micro-controllers: For the central hub and socket nodes.
+- PZEM-004T: For energy monitoring and data collection from the sockets.
+- PC817 and BC547: For controlling and switching socket power.
+
+### Cloud and Data Analytics: 
+- ThingSpeak: For data storage and initial data analysis.
+- Google Colab: For developing machine learning models to predict energy usage.
+
+
 ## Key Features: 
 
  ⁠-  Remote Control: Turn your appliances on or off remotely using your smartphone. No more worrying about leaving devices on when you’re away from home.
