@@ -7,20 +7,23 @@ import {
   StyleProp,
   ViewStyle,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import React from 'react';
 import {Theme} from '@/libs/config/theme';
 import {useThemedStyles} from '@/libs/hooks';
 import {Typography} from '../typography';
 import {fontPixel, pixelSizeHorizontal, pixelSizeVertical} from '@/libs/utils';
+import {colors} from '@/libs/constants';
 
 type ButtonSize = 'sm' | 'md' | 'lg';
-export type ButtonVariant = 'outlined' | 'contained' | 'text';
+export type ButtonVariant = 'outlined' | 'contained' | 'text' | 'filled';
 
 interface ButtonProps extends PressableProps {
   noStyles?: boolean;
   size?: ButtonSize;
   variant?: ButtonVariant;
+  loading?: boolean;
   textStyles?: StyleProp<TextStyle>;
   children: React.ReactNode;
   prefixIcon?: React.ReactNode;
@@ -35,6 +38,7 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
   textStyles,
   disabled,
   noStyles,
+  loading,
   children,
   ...otherPressableProps
 }) => {
@@ -44,6 +48,7 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
     outlined: baseStyle.outLineText,
     contained: baseStyle.containedText,
     text: baseStyle.textTypography,
+    filled: baseStyle.fillText,
   };
 
   const sizeStyle = {
@@ -56,6 +61,7 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
     outlined: baseStyle.outlined,
     contained: baseStyle.contained,
     text: baseStyle.text,
+    filled: baseStyle.fill,
   };
 
   const mainButtonStyles = ({pressed}: {pressed: boolean}) => [
@@ -66,6 +72,13 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
     disabled && baseStyle.disabled,
     style,
   ];
+
+  const loadingIconStyles = {
+    outlined: colors.orange[200],
+    contained: colors.white[100],
+    text: colors.orange[200],
+    filled: colors.white[100],
+  };
 
   if (noStyles) {
     return (
@@ -88,6 +101,13 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
         style={[baseStyle.buttonText, baseTextStyle[variant], textStyles]}>
         {children}
       </Typography>
+      {loading && (
+        <ActivityIndicator
+          style={baseStyle.loader}
+          color={loadingIconStyles[variant]}
+          size={16}
+        />
+      )}
     </Pressable>
   );
 };
@@ -126,6 +146,13 @@ const styles = (theme: Theme) => {
     outLineText: {
       color: theme.colors.gray[200],
     },
+    fillText: {
+      color: theme.colors.white[100],
+    },
+    fill: {
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.orange[500],
+    },
     lg: {
       paddingVertical: pixelSizeVertical(20),
     },
@@ -150,6 +177,9 @@ const styles = (theme: Theme) => {
     },
     disabled: {
       opacity: 0.5,
+    },
+    loader: {
+      marginLeft: pixelSizeHorizontal(10),
     },
   });
 };
