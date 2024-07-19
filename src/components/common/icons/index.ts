@@ -13,3 +13,5 @@ export * from './BluetoothAudio';
 export * from './Warning';
 export * from './WireLess';
 export * from './Close';
+export * from './OpenEye';
+export * from './ClosedEye';

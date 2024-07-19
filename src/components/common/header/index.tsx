@@ -7,14 +7,14 @@ import {
   ViewStyle,
 } from 'react-native';
 import React from 'react';
-import {Avatar} from '../avatar';
 import {Button} from '../button';
-import {BluetoothRoundedIcon, HomeRoundedIcon} from '../icons';
+import {AccountIcon, BluetoothRoundedIcon, HomeRoundedIcon} from '../icons';
 import {useThemedStyles} from '@/libs/hooks';
 import {Theme} from '@/libs/config/theme';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackScreens} from '@/navigation/type';
+import {useAuthContext} from '@/libs/context';
 
 interface HeaderProps {
   title?: string;
@@ -25,15 +25,15 @@ interface HeaderProps {
 
 export const Header: React.FunctionComponent<HeaderProps> = ({
   buttonStyles,
-  title,
   showHomeIcon,
   buttonTextStyles,
 }) => {
   const style = useThemedStyles(styles);
+  const {user} = useAuthContext();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackScreens>>();
   const navigateToDashboard = () => {
-    navigation.navigate('Dashboard');
+    navigation.navigate<any>('Main', {screen: 'Dashboard'});
   };
   return (
     <View style={style.container}>
@@ -42,12 +42,13 @@ export const Header: React.FunctionComponent<HeaderProps> = ({
           <HomeRoundedIcon />
         </TouchableOpacity>
       ) : (
-        <Avatar />
+        <AccountIcon size={44} />
       )}
       <Button style={[style.btn, buttonStyles]} textStyles={buttonTextStyles}>
-        {title ?? 'Israel Obanijesu'}
+        {user?.firstName} {user?.lastName}
       </Button>
-      <TouchableOpacity onPress={() => navigation.navigate('AddDevice')}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate<any>('Main', {screen: 'AddDevice'})}>
         <BluetoothRoundedIcon />
       </TouchableOpacity>
     </View>
