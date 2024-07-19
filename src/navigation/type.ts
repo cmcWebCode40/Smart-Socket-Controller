@@ -1,11 +1,18 @@
 import {SocketIdentifiers} from '@/libs/types';
 
-export type RootStackScreens = {
+export type MainStackScreens = {
   Account: undefined;
   AddDevice: undefined;
   Devices: undefined;
   Dashboard: undefined;
-  DeviceDetails: {
+  DeviceDetails?: {
     socketId: SocketIdentifiers;
+  };
+};
+
+export type RootStackScreens = {
+  Main: RootStackScreens;
+  Auth: {
+    SignIn: undefined;
   };
 };

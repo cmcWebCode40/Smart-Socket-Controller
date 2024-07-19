@@ -1,20 +1,49 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import {RootStackScreens} from './type';
 import {Dashboard} from './Dashboard';
-import {AddDeviceScreen, DeviceDetailsScreen} from '@/screens';
+import {AddDeviceScreen, DeviceDetailsScreen, SignInScreen} from '@/screens';
+import {useAuthContext} from '@/libs/context';
 
-const Stack = createNativeStackNavigator<RootStackScreens>();
+const RootStack = createNativeStackNavigator<any>();
+const MainStack = createNativeStackNavigator<any>();
+const AuthStack = createNativeStackNavigator<any>();
 
-export const RootNavigator: React.FunctionComponent = () => {
+const MainNavigator = () => {
   return (
-    <Stack.Navigator
+    <MainStack.Navigator
       screenOptions={{
         headerShown: false,
       }}>
-      <Stack.Screen name="Dashboard" component={Dashboard} />
-      <Stack.Screen name="AddDevice" component={AddDeviceScreen} />
-      <Stack.Screen name="DeviceDetails" component={DeviceDetailsScreen} />
-    </Stack.Navigator>
+      <MainStack.Screen name="Dashboard" component={Dashboard} />
+      <MainStack.Screen name="AddDevice" component={AddDeviceScreen} />
+      <MainStack.Screen name="DeviceDetails" component={DeviceDetailsScreen} />
+    </MainStack.Navigator>
+  );
+};
+
+const AuthNavigator = () => {
+  return (
+    <AuthStack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}>
+      <AuthStack.Screen name="SignIn" component={SignInScreen} />
+    </AuthStack.Navigator>
+  );
+};
+
+export const RootNavigator: React.FunctionComponent = () => {
+  const {isAuthenticated} = useAuthContext();
+  return (
+    <RootStack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}>
+      {isAuthenticated ? (
+        <RootStack.Screen name="Main" component={MainNavigator} />
+      ) : (
+        <RootStack.Screen name="Auth" component={AuthNavigator} />
+      )}
+    </RootStack.Navigator>
   );
 };

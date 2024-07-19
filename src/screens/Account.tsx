@@ -3,13 +3,18 @@ import React from 'react';
 import {useThemedStyles} from '@/libs/hooks';
 import {Theme} from '@/libs/config/theme';
 import {pixelSizeHorizontal, pixelSizeVertical} from '@/libs/utils';
-import {Typography} from '@/components/common';
+import {Button} from '@/components/common';
+import {useAuthContext} from '@/libs/context';
 
 export const AccountScreen: React.FunctionComponent = () => {
   const style = useThemedStyles(styles);
+
+  const {clearUser} = useAuthContext();
   return (
     <View style={style.container}>
-      <Typography>Accounts</Typography>
+      <Button variant="filled" onPress={clearUser}>
+        Logout
+      </Button>
     </View>
   );
 };
