@@ -6,11 +6,11 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {useThemedStyles} from '@/libs/hooks';
 import {Theme} from '@/libs/config/theme';
-import {PlugIcon, SwitchIcon, Typography} from '../common';
-import {fontPixel, pixelSizeVertical} from '@/libs/utils';
+import {Button, PlugIcon, Typography} from '../common';
+import {fontPixel, pixelSizeHorizontal, pixelSizeVertical} from '@/libs/utils';
 import TriangleImage from '../../../assets/images/triangle.png';
 import {colors} from '@/libs/constants';
 import {SocketIdentifiers} from '@/libs/types';
@@ -28,27 +28,9 @@ interface MinimalEnergyDeviceCardProps {
 
 export const MinimalEnergyDeviceCard: React.FunctionComponent<
   MinimalEnergyDeviceCardProps
-> = ({
-  style,
-  index,
-  power,
-  socketId,
-  socketNo,
-  state,
-  onViewDetails,
-  onSwitch,
-}) => {
+> = ({style, index, power, socketId, socketNo, onViewDetails, onSwitch}) => {
   const textColor = index % 2 === 0 ? colors.orange[400] : colors.green[300];
-  const [isEnabled, setIsEnabled] = useState(false);
   const mainStyle = useThemedStyles(styles);
-
-  useEffect(() => {
-    if (state === 'on') {
-      setIsEnabled(true);
-    }
-  }, [state]);
-
-  const switchValue = state === 'off' ? 'on' : 'off';
 
   return (
     <TouchableOpacity
@@ -68,14 +50,22 @@ export const MinimalEnergyDeviceCard: React.FunctionComponent<
             <Typography style={mainStyle.title}>Socket {socketNo}</Typography>
             <Typography style={mainStyle.deviceId}>{socketId}</Typography>
           </View>
-          <SwitchIcon
-            state={state}
-            isEnabled={isEnabled}
-            onChange={() => {
-              setIsEnabled(state === 'off' ? true : false);
-              onSwitch(socketId, switchValue);
-            }}
-          />
+        </View>
+        <View style={mainStyle.btnContainer}>
+          <Button
+            variant="filled"
+            size="sm"
+            onPress={() => onSwitch(socketId, 'on')}
+            style={[mainStyle.btnFooter, mainStyle.btnSpaceRight]}>
+            On
+          </Button>
+          <Button
+            size="sm"
+            variant="contained"
+            onPress={() => onSwitch(socketId, 'off')}
+            style={[mainStyle.btnFooter, mainStyle.btnSpaceLeft]}>
+            Off
+          </Button>
         </View>
       </View>
     </TouchableOpacity>
@@ -84,6 +74,18 @@ export const MinimalEnergyDeviceCard: React.FunctionComponent<
 
 const styles = (theme: Theme) => {
   return StyleSheet.create({
+    btnContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: pixelSizeVertical(8),
+    },
+    btnFooter: {
+      width: '50%',
+    },
+    btnSpaceRight: {},
+    btnSpaceLeft: {
+      marginLeft: pixelSizeHorizontal(4),
+    },
     wrapper: {
       position: 'relative',
     },

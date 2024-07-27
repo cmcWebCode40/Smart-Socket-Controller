@@ -1,8 +1,8 @@
 import {View, StyleSheet, TouchableOpacity, Image} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {useThemedStyles} from '@/libs/hooks';
 import {Theme} from '@/libs/config/theme';
-import {LargePlugIcon, SwitchIcon, Typography} from '../common';
+import {Button, LargePlugIcon, Typography} from '../common';
 import {fontPixel, pixelSizeHorizontal, pixelSizeVertical} from '@/libs/utils';
 import {colors} from '@/libs/constants';
 import LineImage from '../../../assets/images/line.png';
@@ -22,18 +22,9 @@ export const EnergyDeviceCard: React.FunctionComponent<
   EnergyDeviceCardProps
 > = ({onViewDetails, state, power, voltage, socketId, socketNo, onSwitch}) => {
   const {green, red} = colors;
-  const [isEnabled, setIsEnabled] = useState(false);
   const mainStyle = useThemedStyles(styles);
 
-  useEffect(() => {
-    if (state === 'on') {
-      setIsEnabled(true);
-    }
-  }, [state]);
-
   const isOnline = state === 'on';
-
-  const switchValue = state === 'off' ? 'on' : 'off';
 
   return (
     <TouchableOpacity
@@ -76,16 +67,21 @@ export const EnergyDeviceCard: React.FunctionComponent<
           <Typography variant="b1" style={mainStyle.reading}>
             {voltage} V
           </Typography>
-          <SwitchIcon
-            state={state}
-            isEnabled={isEnabled}
-            style={mainStyle.switch}
-            onChange={() => {
-              setIsEnabled(state === 'off' ? true : false);
-              onSwitch(socketId, switchValue);
-            }}
-          />
         </View>
+      </View>
+      <View style={mainStyle.btnContainer}>
+        <Button
+          variant="filled"
+          onPress={() => onSwitch(socketId, 'on')}
+          style={[mainStyle.btnFooter, mainStyle.btnSpaceRight]}>
+          On
+        </Button>
+        <Button
+          variant="contained"
+          onPress={() => onSwitch(socketId, 'off')}
+          style={[mainStyle.btnFooter, mainStyle.btnSpaceLeft]}>
+          Off
+        </Button>
       </View>
     </TouchableOpacity>
   );
@@ -93,6 +89,20 @@ export const EnergyDeviceCard: React.FunctionComponent<
 
 const styles = (theme: Theme) => {
   return StyleSheet.create({
+    btnContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: pixelSizeHorizontal(16),
+      marginTop: pixelSizeVertical(8),
+    },
+    btnFooter: {
+      width: '50%',
+    },
+    btnSpaceRight: {},
+    btnSpaceLeft: {
+      marginLeft: pixelSizeHorizontal(4),
+      borderRadius: theme.radius.lg,
+    },
     container: {
       shadowOffset: {
         width: 0,
