@@ -14,7 +14,7 @@ import {MinimalEnergyDeviceCard} from '@/components/energy-device-cards';
 import {EnergyUsageProgressIndicator} from '@/components/energy-usage-progress-indicator';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackScreens} from '@/navigation/type';
+import {MainStackScreens} from '@/navigation/type';
 import {useBluetoothContext} from '@/libs/context';
 import {SocketIdentifiers} from '@/libs/types';
 
@@ -22,14 +22,14 @@ export const HomeScreen: React.FunctionComponent = () => {
   const style = useThemedStyles(styles);
   const {socketInfo, socketPowerControl} = useBluetoothContext();
   const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackScreens>>();
+    useNavigation<NativeStackNavigationProp<MainStackScreens>>();
 
   const handleViewDetails = (socketId: SocketIdentifiers) => {
     navigation.navigate('DeviceDetails', {socketId});
   };
   const socket1 = socketInfo?.SCK0001?.energy ?? 0;
   const socket2 = socketInfo?.SCK0002?.energy ?? 0;
-  const totalPowerConsumption = Math.round(socket1 + socket2 * 100);
+  const totalPowerConsumption = Math.round(socket1 + socket2 * 10);
 
   return (
     <View style={style.container}>

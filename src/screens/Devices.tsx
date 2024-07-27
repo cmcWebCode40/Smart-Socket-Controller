@@ -6,7 +6,7 @@ import {pixelSizeHorizontal, pixelSizeVertical} from '@/libs/utils';
 import {EnergyDeviceCard} from '@/components/energy-device-cards';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackScreens} from '@/navigation/type';
+import {MainStackScreens} from '@/navigation/type';
 import {useBluetoothContext} from '@/libs/context';
 import {Socket} from '@/libs/constants';
 import {SocketIdentifiers} from '@/libs/types';
@@ -15,7 +15,7 @@ export const DevicesScreen: React.FunctionComponent = () => {
   const style = useThemedStyles(styles);
   const {socketInfo, socketPowerControl} = useBluetoothContext();
   const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackScreens>>();
+    useNavigation<NativeStackNavigationProp<MainStackScreens>>();
 
   const handleViewDetails = (socketId: SocketIdentifiers) => {
     navigation.navigate('DeviceDetails', {

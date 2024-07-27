@@ -11,13 +11,13 @@ import {
   EnergyDeviceInfoCard,
 } from '@/components/energy-device-cards';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackScreens} from '@/navigation/type';
+import {MainStackScreens} from '@/navigation/type';
 import {useBluetoothContext} from '@/libs/context';
 import {SocketInfo} from '@/libs/types';
 import {EnergyLimitForm} from '@/components/set-energy-limit-form';
 
 type DeviceDetailsScreenProps = NativeStackScreenProps<
-  RootStackScreens,
+  MainStackScreens,
   'DeviceDetails'
 >;
 
@@ -28,7 +28,9 @@ export const DeviceDetailsScreen: React.FunctionComponent<
   const style = useThemedStyles(styles);
   const {socketInfo, socketPowerControl} = useBluetoothContext();
 
-  const socket = socketInfo[params.socketId] as SocketInfo;
+  const socket = params?.socketId
+    ? (socketInfo[params?.socketId] as SocketInfo)
+    : null;
 
   if (!socket) {
     return null;
@@ -53,7 +55,7 @@ export const DeviceDetailsScreen: React.FunctionComponent<
     },
   ];
 
-  const energyUsage = Math.round(socket.energy * 100);
+  const energyUsage = Math.round(socket.energy * 10);
 
   const resetSocket = () => {
     socketPowerControl(socket.id, 'r');

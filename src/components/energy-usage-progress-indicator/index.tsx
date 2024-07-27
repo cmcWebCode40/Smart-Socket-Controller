@@ -21,11 +21,10 @@ export const EnergyUsageProgressIndicator: React.FunctionComponent<
   } = themes;
   const fillColor = invertColor ? green[300] : orange[400];
   const wirelessColor = invertColor ? orange[400] : green[300];
-
   return (
     <AnimatedCircularProgress
       width={20}
-      fill={power}
+      fill={power / 2}
       lineCap="round"
       style={[style.container, {shadowColor: fillColor}]}
       size={heightPixel(220)}
@@ -37,7 +36,9 @@ export const EnergyUsageProgressIndicator: React.FunctionComponent<
       {() => (
         <View style={style.content}>
           <WireLessIcon color={wirelessColor} />
-          <Typography variant="h1">{power} Wh</Typography>
+          <Typography style={style.progressTitle} variant="h1">
+            {power / 100} KWh
+          </Typography>
           <Typography variant="b1" style={style.tag}>
             Energy Usage
           </Typography>
@@ -75,6 +76,9 @@ const styles = (theme: Theme) => {
       textAlign: 'center',
       fontSize: fontPixel(theme.fontSize.s),
       color: theme.colors.black[200],
+    },
+    progressTitle: {
+      textAlign: 'center',
     },
   });
 };
