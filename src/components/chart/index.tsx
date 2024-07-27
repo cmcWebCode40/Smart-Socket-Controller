@@ -1,49 +1,83 @@
 import {theme} from '@/libs/config/theme';
+import {useBluetoothContext} from '@/libs/context';
 import {heightPixel} from '@/libs/utils';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, View} from 'react-native';
 import {LineChart} from 'react-native-gifted-charts';
 
+interface SocketInfo {
+  current: number;
+  energy: number;
+  frequency: number;
+  id: string;
+  pf: number;
+  power: number;
+  status: 'on' | 'off';
+  voltage: number;
+}
 export const EnergyUsageChart: React.FunctionComponent = () => {
   const {
     colors: {orange, yellow, gray},
   } = theme;
-  const labelTextStyle = {color: gray[600], fontSize: 12};
-  const lineData = [
-    {value: 0, label: 'Mon', spacing: 5, labelTextStyle},
-    {value: 10, label: 'Tue', labelTextStyle},
-    {value: 8, label: 'Wed', labelTextStyle},
-    {value: 20, label: 'Thur', labelTextStyle},
-    {value: 28, label: 'Fri', labelTextStyle},
-    {value: 30, label: 'Sat', labelTextStyle},
-    {value: 10, label: 'Sun', labelTextStyle},
-  ];
 
-  const lineData2 = [
-    {value: 0, label: 'Mon', labelTextStyle},
-    {value: 20, label: 'Tue', labelTextStyle},
-    {value: 8, label: 'Wed', labelTextStyle},
-    {value: 30, label: 'Thur', labelTextStyle},
-    {value: 10, label: 'Fri', labelTextStyle},
-    {value: 24, label: 'Sat', labelTextStyle},
-    {value: 30, label: 'Sun', labelTextStyle},
-  ];
+  const {socketInfo} = useBluetoothContext();
+
+  const [socket1Data, setSocket1Data] = useState<SocketInfo[]>([]);
+  const [socket2Data, setSocket2Data] = useState<SocketInfo[]>([]);
+
+  useEffect(() => {
+    if (socketInfo.SCK0001) {
+      setSocket1Data(prevData => [
+        ...prevData,
+        ...(Array.isArray(socketInfo.SCK0001)
+          ? socketInfo.SCK0001
+          : [socketInfo.SCK0001]),
+      ]);
+    }
+    if (socketInfo.SCK0002) {
+      setSocket2Data(prevData => [
+        ...prevData,
+        ...(Array.isArray(socketInfo.SCK0002)
+          ? socketInfo.SCK0002
+          : [socketInfo.SCK0002]),
+      ]);
+    }
+  }, [socketInfo.SCK0001, socketInfo.SCK0002]);
+
+  const socket1PowerData = socket1Data.map(data => ({
+    value: data.power,
+  }));
+  const socket2PowerData = socket2Data.map(data => ({
+    value: data.power,
+  }));
+
   return (
-    <LineChart
-      spacing={45}
-      data={lineData}
-      data2={lineData2}
-      initialSpacing={5}
-      color2={yellow[100]}
-      color1={orange[400]}
-      dataPointsHeight={6}
-      dataPointsWidth={6}
-      noOfSections={4}
-      yAxisColor={gray[400]}
-      rulesColor={gray[300]}
-      xAxisColor={gray[400]}
-      height={heightPixel(200)}
-      dataPointsColor1={orange[400]}
-      dataPointsColor2={yellow[100]}
-    />
+    <View style={styles.container}>
+      <LineChart
+        data={socket1PowerData}
+        data2={socket2PowerData}
+        width={300}
+        initialSpacing={5}
+        color2={yellow[100]}
+        color1={orange[400]}
+        dataPointsHeight={6}
+        dataPointsWidth={6}
+        noOfSections={5}
+        yAxisColor={gray[400]}
+        rulesColor={gray[300]}
+        xAxisColor={gray[400]}
+        height={heightPixel(200)}
+        dataPointsColor1={orange[400]}
+        dataPointsColor2={yellow[100]}
+      />
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
