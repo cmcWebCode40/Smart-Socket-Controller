@@ -20,13 +20,13 @@ export const SignInSchema = Yup.object().shape({
   password: Yup.string().required('Password is required!').trim(),
 });
 
-const formInitialValues = {
-  email: 'mike@gmail.com',
-  password: '1234',
-};
+const USER_EMAIL = 'nicanorforka@protonmail.com';
+const USER_PASSWORD = 'Nicanor';
 
-const USER_EMAIL = 'mike@gmail.com';
-const USER_PASSWORD = '1234';
+const formInitialValues = {
+  email: USER_EMAIL,
+  password: USER_PASSWORD,
+};
 
 export const SignInScreen: React.FunctionComponent = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -44,8 +44,8 @@ export const SignInScreen: React.FunctionComponent = () => {
     }
     const user = {
       email: payload.email,
-      firstName: 'Israel',
-      lastName: 'ObaniJesu',
+      firstName: 'Nicanor',
+      lastName: 'Forcka MBATCHOU',
     };
     await saveToAsyncStore(USER_SESSION, user);
     updateUser(user);

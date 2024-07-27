@@ -12,7 +12,8 @@ export const AccountScreen: React.FunctionComponent = () => {
   const {clearUser} = useAuthContext();
   return (
     <View style={style.container}>
-      <Button variant="filled" onPress={clearUser}>
+      <View />
+      <Button variant="filled" onPress={clearUser} style={style.btn}>
         Logout
       </Button>
     </View>
@@ -23,9 +24,13 @@ const styles = (theme: Theme) => {
   return StyleSheet.create({
     container: {
       flex: 1,
+      justifyContent: 'space-between',
       paddingVertical: pixelSizeVertical(16),
       paddingHorizontal: pixelSizeHorizontal(16),
       backgroundColor: theme.colors.white[100],
+    },
+    btn: {
+      marginBottom: pixelSizeVertical(40),
     },
   });
 };
