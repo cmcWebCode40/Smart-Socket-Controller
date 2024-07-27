@@ -1,4 +1,22 @@
+<p align="center">
+  <a aria-label="Ios" href="npmjs.com/package/expo" target="_blank">
+    <img alt="IOS" src="https://img.shields.io/badge/iOS-999999.svg?style=flat-square&logo=APPLE&labelColor=999999&logoColor=fff)" />
+  </a>
+  <a aria-label="supports Android" href="https://chat.expo.dev" target="_blank">
+    <img alt="supports Android" src="https://img.shields.io/badge/Android-A4C639.svg?style=flat-square&logo=ANDROID&labelColor=A4C639&logoColor=fff" />
+  </a>
+</p>
+
+
 # Smart Socket Controller
+
+<img
+  src="docs/socket_screen_shot.png"
+  alt="Alt text"
+  title="Optional title"
+  style="margin:0 4px; max-width: 500px"
+/>
+
 
 
 A React Native application that leverages Bluetooth Low Energy (BLE) to communicate with an ESP HUB controller for data receiving and exchange
