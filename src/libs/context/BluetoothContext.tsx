@@ -87,19 +87,51 @@ export const BluetoothContextProvider: React.FunctionComponent<
     SCK0001: undefined,
   });
 
-  const handleLocationPermission = async () => {
-    if (Platform.OS === 'android' && Platform.Version >= 23) {
-      try {
-        await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-        );
-      } catch (error) {
-        Alert.alert('Error requesting location permission');
-      }
+  const handleAndroidPermissions = () => {
+    if (Platform.OS === 'android' && Platform.Version >= 31) {
+      PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+      ]).then(result => {
+        if (result) {
+          console.debug(
+            '[handleAndroidPermissions] User accepts runtime permissions android 12+',
+          );
+        } else {
+          console.error(
+            '[handleAndroidPermissions] User refuses runtime permissions android 12+',
+          );
+        }
+      });
+    } else if (Platform.OS === 'android' && Platform.Version >= 23) {
+      PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      ).then(checkResult => {
+        if (checkResult) {
+          console.debug(
+            '[handleAndroidPermissions] runtime permission Android <12 already OK',
+          );
+        } else {
+          PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          ).then(requestResult => {
+            if (requestResult) {
+              console.debug(
+                '[handleAndroidPermissions] User accepts runtime permission android <12',
+              );
+            } else {
+              console.error(
+                '[handleAndroidPermissions] User refuses runtime permission android <12',
+              );
+            }
+          });
+        }
+      });
     }
   };
+
   useEffect(() => {
-    handleLocationPermission();
+    handleAndroidPermissions();
     BleManager.checkState().then(state => {
       if (state !== 'on') {
         BleManager.enableBluetooth().then(() => {
@@ -146,7 +178,6 @@ export const BluetoothContextProvider: React.FunctionComponent<
       },
     );
     BleManager.getConnectedPeripherals([]).then(connectedPeripherals => {
-      // Success code
       const discoveredDevice = Array.from(connectedPeripherals.values())[0];
       if (Array.from(peripherals.values()).length < 1 && discoveredDevice) {
         connectPeripheral({
