@@ -1,4 +1,4 @@
-import {View, StyleSheet, ViewStyle, ScrollView} from 'react-native';
+import {View, StyleSheet, ViewStyle, ScrollView, Alert} from 'react-native';
 import React, {useState} from 'react';
 import {useThemedStyles} from '@/libs/hooks';
 import {Theme} from '@/libs/config/theme';
@@ -15,6 +15,7 @@ import {MainStackScreens} from '@/navigation/type';
 import {useBluetoothContext} from '@/libs/context';
 import {SocketInfo} from '@/libs/types';
 import {EnergyLimitForm} from '@/components/set-energy-limit-form';
+import {FormGroup} from '@/components/common/form-group';
 
 type DeviceDetailsScreenProps = NativeStackScreenProps<
   MainStackScreens,
@@ -25,8 +26,14 @@ export const DeviceDetailsScreen: React.FunctionComponent<
   DeviceDetailsScreenProps
 > = ({route: {params}}) => {
   const [openModal, setOpenModal] = useState(false);
+  const [loadLimit, setLoadLimit] = useState<undefined | string>(undefined);
   const style = useThemedStyles(styles);
-  const {socketInfo, socketPowerControl} = useBluetoothContext();
+  const {
+    socketInfo,
+    socketPowerControl,
+    addLoadLimit,
+    loadLimit: limit,
+  } = useBluetoothContext();
 
   const socket = params?.socketId
     ? (socketInfo[params?.socketId] as SocketInfo)
@@ -47,18 +54,27 @@ export const DeviceDetailsScreen: React.FunctionComponent<
     },
     {
       type: 'POWER_CONSUMPTION',
-      value: `${socket?.power} KW`,
+      value: `${socket?.power} W`,
     },
     {
-      type: 'FREQUENCY',
-      value: `${socket?.frequency}`,
+      type: 'POWER_FACTOR',
+      value: `${socket?.pf}`,
     },
   ];
 
-  const energyUsage = Math.round(socket.energy * 10);
+  const energyUsage = socket.energy;
 
   const resetSocket = () => {
     socketPowerControl(socket.id, 'r');
+  };
+
+  const updateLimit = () => {
+    if (loadLimit) {
+      addLoadLimit(loadLimit);
+      setLoadLimit(undefined);
+    } else {
+      Alert.alert('Please enter load limit');
+    }
   };
 
   return (
@@ -73,7 +89,7 @@ export const DeviceDetailsScreen: React.FunctionComponent<
         <View style={style.deviceStatus}>
           <View style={[style.status, style.devicePowerStatus]}>
             <Typography style={[style.statusText, style.devicePowerStatusText]}>
-              {socket.power} KW Load Limit Set
+              {limit} KW Load Limit Set
             </Typography>
           </View>
           <View style={[style.status, style.deviceStateStatus]}>
@@ -83,7 +99,7 @@ export const DeviceDetailsScreen: React.FunctionComponent<
           </View>
         </View>
         <View style={style.progressIndicatorContainer}>
-          <EnergyUsageProgressIndicator power={energyUsage} invertColor />
+          <EnergyUsageProgressIndicator energy={energyUsage} invertColor />
         </View>
         <View style={style.infoContainer}>
           {info.map((item, index) => (
@@ -95,6 +111,14 @@ export const DeviceDetailsScreen: React.FunctionComponent<
           ))}
         </View>
         <View style={style.buttonContainer}>
+          <FormGroup
+            onChangeText={setLoadLimit}
+            value={loadLimit}
+            placeholder="Enter load limit"
+          />
+          <Button variant="filled" style={style.reset} onPress={updateLimit}>
+            Send
+          </Button>
           <Button
             variant="outlined"
             style={style.reset}

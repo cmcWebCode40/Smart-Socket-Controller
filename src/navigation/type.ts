@@ -11,7 +11,7 @@ export type MainStackScreens = {
 };
 
 export type RootStackScreens = {
-  Main: RootStackScreens;
+  Main: MainStackScreens;
   Auth: {
     SignIn: undefined;
   };

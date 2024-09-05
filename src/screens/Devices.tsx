@@ -1,4 +1,4 @@
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, ScrollView} from 'react-native';
 import React from 'react';
 import {Theme} from '@/libs/config/theme';
 import {useThemedStyles} from '@/libs/hooks';
@@ -10,6 +10,7 @@ import {MainStackScreens} from '@/navigation/type';
 import {useBluetoothContext} from '@/libs/context';
 import {Socket} from '@/libs/constants';
 import {SocketIdentifiers} from '@/libs/types';
+import {Button} from '@/components/common';
 
 export const DevicesScreen: React.FunctionComponent = () => {
   const style = useThemedStyles(styles);
@@ -25,7 +26,7 @@ export const DevicesScreen: React.FunctionComponent = () => {
 
   return (
     <View style={style.container}>
-      <View style={style.content}>
+      <ScrollView style={style.content}>
         {socketInfo?.SCK0001 && (
           <EnergyDeviceCard
             socketNo={'1'}
@@ -48,7 +49,10 @@ export const DevicesScreen: React.FunctionComponent = () => {
             onViewDetails={handleViewDetails}
           />
         )}
-      </View>
+      </ScrollView>
+      {socketInfo?.SCK0001 || socketInfo?.SCK0001 ? (
+        <Button variant="contained">Set Limit</Button>
+      ) : null}
     </View>
   );
 };
@@ -60,6 +64,8 @@ const styles = (theme: Theme) => {
       paddingVertical: pixelSizeVertical(16),
       paddingHorizontal: pixelSizeHorizontal(16),
       backgroundColor: theme.colors.white[100],
+      justifyContent: 'space-between',
+      paddingBottom: pixelSizeVertical(40),
     },
     content: {
       marginTop: pixelSizeVertical(48),

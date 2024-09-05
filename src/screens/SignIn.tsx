@@ -20,8 +20,8 @@ export const SignInSchema = Yup.object().shape({
   password: Yup.string().required('Password is required!').trim(),
 });
 
-const USER_EMAIL = '';
-const USER_PASSWORD = '';
+const USER_EMAIL = 'nicanorforka@protonmail.com';
+const USER_PASSWORD = 'Nicanor';
 
 const formInitialValues = {
   email: USER_EMAIL,
@@ -39,7 +39,8 @@ export const SignInScreen: React.FunctionComponent = () => {
       setIsLoading(false);
     }, 3000);
     if (
-      payload.email.toLocaleLowerCase() !== USER_EMAIL.toLocaleLowerCase() ||
+      payload.email.toLocaleLowerCase().trim() !==
+        USER_EMAIL.toLocaleLowerCase() ||
       payload.password !== USER_PASSWORD
     ) {
       Alert.alert('Incorrect email or password');

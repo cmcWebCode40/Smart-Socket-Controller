@@ -102,11 +102,6 @@ export const AddDeviceScreen: React.FunctionComponent = () => {
     </View>
   );
 };
-
-// const data = new TextEncoder().encode(
-//   JSON.stringify({id: 'SCK0002', cmd: 'off'}),
-// );
-// write(data, characteristics);
 const styles = (theme: Theme) => {
   return StyleSheet.create({
     container: {

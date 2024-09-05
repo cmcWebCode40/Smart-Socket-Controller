@@ -4,7 +4,6 @@ import {
   AcCurrentIcon,
   AcVoltIcon,
   ElectricPlugIcon,
-  FrequencyIcon,
   Typography,
 } from '../common';
 import {colors} from '@/libs/constants';
@@ -23,7 +22,7 @@ export type DeviceInfoStatus =
   | 'AC_VOLTAGE'
   | 'AC_CURRENT'
   | 'POWER_CONSUMPTION'
-  | 'FREQUENCY';
+  | 'POWER_FACTOR';
 
 const statues = {
   AC_VOLTAGE: {
@@ -41,10 +40,10 @@ const statues = {
     color: blue[100],
     title: 'Power Consumption',
   },
-  FREQUENCY: {
-    icon: <FrequencyIcon />,
+  POWER_FACTOR: {
+    icon: <AcVoltIcon />,
     color: green[400],
-    title: 'Frequency',
+    title: 'Power Factor',
   },
 };
 interface EnergyDeviceInfoCardProps {

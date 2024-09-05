@@ -20,7 +20,7 @@ interface MinimalEnergyDeviceCardProps {
   index: number;
   socketId: string;
   socketNo: string;
-  power: number;
+  energy: number;
   state: 'on' | 'off';
   onViewDetails: (id: SocketIdentifiers) => void;
   onSwitch: (socketId: string, state: 'on' | 'off') => void;
@@ -28,7 +28,7 @@ interface MinimalEnergyDeviceCardProps {
 
 export const MinimalEnergyDeviceCard: React.FunctionComponent<
   MinimalEnergyDeviceCardProps
-> = ({style, index, power, socketId, socketNo, onViewDetails, onSwitch}) => {
+> = ({style, index, energy, socketId, socketNo, onViewDetails, onSwitch}) => {
   const textColor = index % 2 === 0 ? colors.orange[400] : colors.green[300];
   const mainStyle = useThemedStyles(styles);
 
@@ -42,7 +42,7 @@ export const MinimalEnergyDeviceCard: React.FunctionComponent<
         <View style={[mainStyle.flexDir, mainStyle.cardHeader]}>
           <PlugIcon />
           <Typography style={[mainStyle.powerRating, {color: textColor}]}>
-            {power} KWh
+            {energy} KWh
           </Typography>
         </View>
         <View style={mainStyle.flexDir}>

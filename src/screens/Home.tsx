@@ -29,7 +29,7 @@ export const HomeScreen: React.FunctionComponent = () => {
   };
   const socket1 = socketInfo?.SCK0001?.energy ?? 0;
   const socket2 = socketInfo?.SCK0002?.energy ?? 0;
-  const totalPowerConsumption = Math.round(socket1 + socket2 * 10);
+  const totalPowerConsumption = socket1 + socket2;
 
   return (
     <View style={style.container}>
@@ -45,7 +45,7 @@ export const HomeScreen: React.FunctionComponent = () => {
           </Button>
         </View>
         <View style={style.progressIndicatorContainer}>
-          <EnergyUsageProgressIndicator power={totalPowerConsumption} />
+          <EnergyUsageProgressIndicator energy={totalPowerConsumption} />
         </View>
         <View style={style.devices}>
           {['Socket 1', 'Socket 2'].map((item, index) => (
@@ -78,7 +78,7 @@ export const HomeScreen: React.FunctionComponent = () => {
                 state={socketInfo.SCK0001.status}
                 onSwitch={socketPowerControl}
                 socketId={Socket.SCK0001}
-                power={socketInfo.SCK0001.power}
+                energy={socketInfo.SCK0001.energy}
                 onViewDetails={handleViewDetails}
                 style={style.connectedDeviceCard}
               />
@@ -90,7 +90,7 @@ export const HomeScreen: React.FunctionComponent = () => {
                 onSwitch={socketPowerControl}
                 socketId={Socket.SCK0002}
                 state={socketInfo.SCK0002.status}
-                power={socketInfo.SCK0002.power}
+                energy={socketInfo.SCK0002.energy}
                 onViewDetails={handleViewDetails}
                 style={style.connectedDeviceCard}
               />
@@ -107,7 +107,6 @@ const styles = (theme: Theme) => {
     container: {
       flex: 1,
       paddingVertical: pixelSizeVertical(16),
-      paddingHorizontal: pixelSizeHorizontal(16),
       backgroundColor: theme.colors.white[100],
     },
     energyUsageBtn: {
@@ -144,6 +143,7 @@ const styles = (theme: Theme) => {
     },
     energyChartContainer: {
       marginTop: pixelSizeVertical(32),
+      // paddingHorizontal: pixelSizeHorizontal(8),
     },
     device: {
       fontSize: theme.fontSize.m,
@@ -151,6 +151,7 @@ const styles = (theme: Theme) => {
     deviceCards: {
       marginTop: pixelSizeVertical(24),
       marginBottom: pixelSizeVertical(24),
+      paddingHorizontal: pixelSizeHorizontal(16),
     },
     deviceHeaderTitle: {
       fontSize: theme.fontSize.m,

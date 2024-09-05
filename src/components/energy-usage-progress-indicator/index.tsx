@@ -9,22 +9,27 @@ import {Circle} from 'react-native-svg';
 
 interface EnergyUsageProgressIndicatorProps {
   invertColor?: boolean;
-  power?: number;
+  energy?: number;
 }
 
 export const EnergyUsageProgressIndicator: React.FunctionComponent<
   EnergyUsageProgressIndicatorProps
-> = ({invertColor, power = 0}) => {
+> = ({invertColor, energy = 0}) => {
   const style = useThemedStyles(styles);
   const {
     colors: {orange, gray, green},
   } = themes;
   const fillColor = invertColor ? green[300] : orange[400];
   const wirelessColor = invertColor ? orange[400] : green[300];
+
+  const maxEnergyCap = 1;
+
+  const totalEnergy = (energy / maxEnergyCap) * 100;
+
   return (
     <AnimatedCircularProgress
       width={20}
-      fill={power / 2}
+      fill={totalEnergy}
       lineCap="round"
       style={[style.container, {shadowColor: fillColor}]}
       size={heightPixel(220)}
@@ -37,7 +42,7 @@ export const EnergyUsageProgressIndicator: React.FunctionComponent<
         <View style={style.content}>
           <WireLessIcon color={wirelessColor} />
           <Typography style={style.progressTitle} variant="h1">
-            {power / 100} KWh
+            {energy} KWh
           </Typography>
           <Typography variant="b1" style={style.tag}>
             Energy Usage

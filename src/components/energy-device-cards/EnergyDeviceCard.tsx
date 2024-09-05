@@ -62,7 +62,7 @@ export const EnergyDeviceCard: React.FunctionComponent<
         <Image source={LineImage} />
         <View>
           <Typography variant="b1" style={mainStyle.reading}>
-            {power} KWh
+            {power} W
           </Typography>
           <Typography variant="b1" style={mainStyle.reading}>
             {voltage} V
